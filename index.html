@@ -76,15 +76,6 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
-
-            <!-- Job/Work Category Filter -->
-            <div class="flex items-center space-x-1.5 flex-1 justify-end min-w-[150px]">
-                <label class="text-xs font-semibold text-slate-500 whitespace-nowrap">業務:</label>
-                <select id="jobCategoryFilter" onchange="renderApp()" class="w-full sm:w-auto px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
-                    <option value="ALL">すべての業務 (全累計)</option>
-                    <!-- Options populated by JS -->
-                </select>
-            </div>
         </section>
 
         <!-- TOP DASHBOARD: Hero Highlight Summary Card (Net Cumulative Time Only) -->
@@ -135,18 +126,10 @@
             </div>
 
             <form id="recordForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <!-- Date & Work Category Inputs -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">日付</label>
-                        <input type="date" id="inputDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">業務種別</label>
-                        <select id="inputJobCategory" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900 text-sm">
-                            <!-- Populated via JS -->
-                        </select>
-                    </div>
+                <!-- Date Input -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">日付</label>
+                    <input type="date" id="inputDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900 text-sm">
                 </div>
 
                 <!-- Quick Buttons (Positive and Negative 30m steps - NO 0m option) -->
@@ -261,17 +244,15 @@
                 <p style="font-size: 11pt; color: #444;">対象年月: <span id="printMonthLabel" style="font-weight: bold; color: #000;"></span></p>
             </div>
 
-            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 10pt;">
-                <div>対象業務: <span id="printJobFilterLabel">すべて</span></div>
+            <div style="margin-bottom: 15px; display: flex; justify-content: flex-end; font-size: 10pt;">
                 <div>発行日: <span id="printTodayDate"></span></div>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 20%;">日付</th>
-                        <th style="width: 25%;">業務種別</th>
-                        <th style="width: 15%;">区分</th>
+                        <th style="width: 25%;">日付</th>
+                        <th style="width: 20%;">区分</th>
                         <th style="width: 20%;">調整時間</th>
                         <th>備考・事由</th>
                     </tr>
@@ -303,22 +284,6 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-
-            <!-- Job Category Management Section -->
-            <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-800 uppercase">業務種別の追加・削除</label>
-                <div class="flex gap-2">
-                    <input type="text" id="newCategoryInput" placeholder="例: A案件, プロジェクトB" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-brand-500">
-                    <button onclick="addJobCategory()" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800">
-                        追加
-                    </button>
-                </div>
-                <div id="categoryChips" class="flex flex-wrap gap-1.5 pt-1">
-                    <!-- Populated via JS -->
-                </div>
-            </div>
-
-            <hr class="border-slate-100">
 
             <!-- Backup Code Copy Section -->
             <div class="space-y-2">
@@ -356,10 +321,8 @@
 
     <script>
         const STORAGE_RECORDS_KEY = 'flextime_diff_records_v3';
-        const STORAGE_CATEGORIES_KEY = 'flextime_diff_categories_v3';
 
         let records = [];
-        let jobCategories = ['メイン業務', 'サブ業務'];
 
         // App Initialization
         window.addEventListener('DOMContentLoaded', () => {
@@ -367,103 +330,9 @@
             document.getElementById('inputDate').value = formatDateIso(today);
             document.getElementById('monthPicker').value = formatDateMonth(today);
 
-            loadCategories();
             loadRecords();
-            renderCategorySelects();
             renderApp();
         });
-
-        // Load Categories from LocalStorage
-        function loadCategories() {
-            try {
-                const stored = localStorage.getItem(STORAGE_CATEGORIES_KEY);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        jobCategories = parsed;
-                    }
-                }
-            } catch (e) {
-                console.error("Failed to load categories", e);
-            }
-        }
-
-        // Save Categories
-        function saveCategories() {
-            try {
-                localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(jobCategories));
-            } catch (e) {
-                console.error("Failed to save categories", e);
-            }
-        }
-
-        // Render Dropdown options for Categories
-        function renderCategorySelects() {
-            const filterSelect = document.getElementById('jobCategoryFilter');
-            const inputSelect = document.getElementById('inputJobCategory');
-            const currentFilterVal = filterSelect.value || 'ALL';
-            const currentInputVal = inputSelect.value;
-
-            // Filter select
-            filterSelect.innerHTML = '<option value="ALL">すべての業務 (全累計)</option>';
-            jobCategories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                filterSelect.appendChild(opt);
-            });
-            filterSelect.value = currentFilterVal;
-
-            // Input select
-            inputSelect.innerHTML = '';
-            jobCategories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                inputSelect.appendChild(opt);
-            });
-            if (currentInputVal && jobCategories.includes(currentInputVal)) {
-                inputSelect.value = currentInputVal;
-            }
-
-            // Chips in Settings
-            const chipsContainer = document.getElementById('categoryChips');
-            chipsContainer.innerHTML = '';
-            jobCategories.forEach(cat => {
-                const chip = document.createElement('span');
-                chip.className = 'inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg';
-                chip.innerHTML = `
-                    ${escapeHtml(cat)}
-                    ${jobCategories.length > 1 ? `<button onclick="removeJobCategory('${escapeHtml(cat)}')" class="text-slate-400 hover:text-rose-600 ml-1 font-bold">×</button>` : ''}
-                `;
-                chipsContainer.appendChild(chip);
-            });
-        }
-
-        function addJobCategory() {
-            const val = document.getElementById('newCategoryInput').value.trim();
-            if (!val) return;
-            if (!jobCategories.includes(val)) {
-                jobCategories.push(val);
-                saveCategories();
-                renderCategorySelects();
-                renderApp();
-                showToast(`「${val}」を追加しました`);
-            }
-            document.getElementById('newCategoryInput').value = '';
-        }
-
-        function removeJobCategory(cat) {
-            if (jobCategories.length <= 1) {
-                showToast("最低1つの業務種別が必要です");
-                return;
-            }
-            jobCategories = jobCategories.filter(c => c !== cat);
-            saveCategories();
-            renderCategorySelects();
-            renderApp();
-            showToast("削除しました");
-        }
 
         // Load Records from LocalStorage
         function loadRecords() {
@@ -500,7 +369,6 @@
         function handleFormSubmit(e) {
             e.preventDefault();
             const date = document.getElementById('inputDate').value;
-            const category = document.getElementById('inputJobCategory').value;
             const sign = parseInt(document.getElementById('inputSign').value, 10);
             const minutesVal = parseInt(document.getElementById('inputMinutes').value, 10);
             const note = document.getElementById('inputNote').value.trim();
@@ -508,7 +376,7 @@
             if (!date || isNaN(minutesVal) || minutesVal <= 0) return;
 
             const totalMinutes = sign * minutesVal;
-            addRecord(date, category, totalMinutes, note);
+            addRecord(date, totalMinutes, note);
 
             document.getElementById('inputNote').value = '';
         }
@@ -517,7 +385,6 @@
         function quickAdd(mins) {
             if (mins === 0) return;
             const date = document.getElementById('inputDate').value;
-            const category = document.getElementById('inputJobCategory').value;
             const note = document.getElementById('inputNote').value.trim();
 
             if (!date) {
@@ -525,17 +392,16 @@
                 return;
             }
 
-            addRecord(date, category, mins, note);
+            addRecord(date, mins, note);
             document.getElementById('inputNote').value = '';
         }
 
-        function addRecord(date, category, minutes, note) {
+        function addRecord(date, minutes, note) {
             if (minutes === 0) return; // Guard against 0 minutes
 
             const record = {
                 id: Date.now().toString(),
                 date: date,
-                category: category || jobCategories[0],
                 minutes: minutes,
                 note: note,
                 createdAt: new Date().toISOString()
@@ -566,13 +432,9 @@
         // Main Render Function
         function renderApp() {
             const selectedMonth = document.getElementById('monthPicker').value;
-            const selectedCategory = document.getElementById('jobCategoryFilter').value;
 
-            // Filter records for selected month and category
-            const monthFiltered = records.filter(r => r.date.startsWith(selectedMonth));
-            const filtered = monthFiltered.filter(r => {
-                return selectedCategory === 'ALL' || r.category === selectedCategory;
-            });
+            // Filter records for selected month
+            const filtered = records.filter(r => r.date.startsWith(selectedMonth));
 
             // Calculate Totals
             let totalExcessMinutes = 0;
@@ -623,7 +485,7 @@
             renderRecordsList(filtered);
 
             // Prepare Print View
-            renderPrintView(filtered, selectedMonth, selectedCategory, netAdjustmentMinutes);
+            renderPrintView(filtered, selectedMonth, netAdjustmentMinutes);
         }
 
         // Render List Items
@@ -658,7 +520,6 @@
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-900">${formatJapaneseDate(r.date)}</span>
-                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold">${escapeHtml(r.category || '業務')}</span>
                             </div>
                             ${r.note ? `<div class="text-xs text-slate-500 mt-0.5">${escapeHtml(r.note)}</div>` : ''}
                         </div>
@@ -672,9 +533,8 @@
         }
 
         // Render Print Table
-        function renderPrintView(filteredList, monthStr, categoryStr, netMins) {
+        function renderPrintView(filteredList, monthStr, netMins) {
             document.getElementById('printMonthLabel').innerText = monthStr.replace('-', '年 ') + '月';
-            document.getElementById('printJobFilterLabel').innerText = categoryStr === 'ALL' ? '全業務' : categoryStr;
             document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('ja-JP');
 
             const tbody = document.getElementById('printTableBody');
@@ -685,7 +545,6 @@
                 const isExcess = r.minutes > 0;
                 tr.innerHTML = `
                     <td>${r.date}</td>
-                    <td>${escapeHtml(r.category || '-')}</td>
                     <td>${isExcess ? '超過 (+)' : '不足 (-)'}</td>
                     <td style="font-weight: bold;">${isExcess ? '+' : '-'}${formatHoursMinutes(Math.abs(r.minutes))}</td>
                     <td>${escapeHtml(r.note || '-')}</td>
@@ -700,30 +559,27 @@
         // CSV Export (Excel UTF-8 BOM compatibility)
         function exportCSV() {
             const selectedMonth = document.getElementById('monthPicker').value;
-            const selectedCategory = document.getElementById('jobCategoryFilter').value;
 
-            const monthFiltered = records.filter(r => r.date.startsWith(selectedMonth));
-            const filtered = monthFiltered.filter(r => selectedCategory === 'ALL' || r.category === selectedCategory);
+            const filtered = records.filter(r => r.date.startsWith(selectedMonth));
 
             if (filtered.length === 0) {
                 showToast("出力する記録がありません");
                 return;
             }
 
-            let csvContent = "\uFEFF日付,業務種別,区分,調整時間(分),調整時間(表記),備考\n";
+            let csvContent = "\uFEFF日付,区分,調整時間(分),調整時間(表記),備考\n";
             filtered.forEach(r => {
                 const type = r.minutes > 0 ? "超過" : "不足";
                 const formatted = (r.minutes > 0 ? "+" : "-") + formatHoursMinutes(Math.abs(r.minutes));
                 const note = (r.note || "").replace(/"/g, '""');
-                const cat = (r.category || "基本業務").replace(/"/g, '""');
-                csvContent += `"${r.date}","${cat}","${type}","${r.minutes}","${formatted}","${note}"\n`;
+                csvContent += `"${r.date}","${type}","${r.minutes}","${formatted}","${note}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.setAttribute('href', url);
-            link.setAttribute('download', `flextime_diff_${selectedMonth}_${selectedCategory}.csv`);
+            link.setAttribute('download', `flextime_diff_${selectedMonth}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -735,7 +591,6 @@
 
         // Settings Modal Handlers
         function openSettingsModal() {
-            renderCategorySelects();
             document.getElementById('settingsModal').classList.remove('hidden');
         }
 
@@ -750,7 +605,7 @@
                 return;
             }
             try {
-                const dataObj = { records: records, categories: jobCategories };
+                const dataObj = { records: records };
                 const code = btoa(encodeURIComponent(JSON.stringify(dataObj)));
 
                 const tempTextArea = document.createElement('textarea');
@@ -782,16 +637,11 @@
                     records = parsed;
                 } else if (parsed && Array.isArray(parsed.records)) {
                     records = parsed.records;
-                    if (Array.isArray(parsed.categories)) {
-                        jobCategories = parsed.categories;
-                        saveCategories();
-                    }
                 } else {
                     throw new Error("Format error");
                 }
 
                 saveRecords();
-                renderCategorySelects();
                 renderApp();
                 closeSettingsModal();
                 document.getElementById('restoreInput').value = '';
