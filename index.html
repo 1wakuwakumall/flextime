@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlexTime - ƒtƒŒƒbƒNƒXc‹ÆEŠÔŠÇ—</title>
+    <title>FlexTime - ãƒ•ãƒ¬ãƒƒã‚¯ã‚¹æ®‹æ¥­ãƒ»æ™‚é–“ç®¡ç†</title>
     <!-- 
-        yƒvƒ‰ƒCƒoƒV[Eƒf[ƒ^ƒZƒLƒ…ƒŠƒeƒB•ÛØz
-        –{ƒAƒvƒŠ‚ÍŠ®‘Sƒ[ƒJƒ‹iƒIƒtƒ‰ƒCƒ“‘Î‰j‚Å“®ì‚µ‚Ü‚·B
-        “ü—Íƒf[ƒ^‚âİ’èî•ñ‚Í‚·‚×‚Ä‚¨g‚¢‚Ìƒuƒ‰ƒEƒUilocalStoragej‚É‚Ì‚İ•Û‘¶‚³‚êA
-        ŠO•”‚ÌƒT[ƒo[‚Ö’ÊME‘—M‚³‚ê‚éˆ—‚ÍˆêØ‘¶İ‚µ‚Ü‚¹‚ñB
+        ã€ãƒ—ãƒ©ã‚¤ãƒã‚·ãƒ¼ãƒ»ãƒ‡ãƒ¼ã‚¿ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£ä¿è¨¼ã€‘
+        æœ¬ã‚¢ãƒ—ãƒªã¯å®Œå…¨ãƒ­ãƒ¼ã‚«ãƒ«ï¼ˆã‚ªãƒ•ãƒ©ã‚¤ãƒ³å¯¾å¿œï¼‰ã§å‹•ä½œã—ã¾ã™ã€‚
+        å…¥åŠ›ãƒ‡ãƒ¼ã‚¿ã‚„è¨­å®šæƒ…å ±ã¯ã™ã¹ã¦ãŠä½¿ã„ã®ãƒ–ãƒ©ã‚¦ã‚¶ï¼ˆlocalStorageï¼‰ã«ã®ã¿ä¿å­˜ã•ã‚Œã€
+        å¤–éƒ¨ã®ã‚µãƒ¼ãƒãƒ¼ã¸é€šä¿¡ãƒ»é€ä¿¡ã•ã‚Œã‚‹å‡¦ç†ã¯ä¸€åˆ‡å­˜åœ¨ã—ã¾ã›ã‚“ã€‚
     -->
-    <!-- Tailwind CSS (ƒfƒUƒCƒ“—pÃ“Iƒ‰ƒCƒuƒ‰ƒŠ) -->
+    <!-- Tailwind CSS (ãƒ‡ã‚¶ã‚¤ãƒ³ç”¨é™çš„ãƒ©ã‚¤ãƒ–ãƒ©ãƒª) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome (ƒAƒCƒRƒ“—p) -->
+    <!-- FontAwesome (ã‚¢ã‚¤ã‚³ãƒ³ç”¨) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -52,21 +52,21 @@
                             <h1 class="text-xl font-bold text-slate-900 tracking-tight leading-none">FlexTime</h1>
                             <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200 flex items-center space-x-1">
                                 <i class="fa-solid fa-shield-halved text-xs"></i>
-                                <span>ƒ[ƒJƒ‹Š®Œ‹i‘—M‚È‚µj</span>
+                                <span>ãƒ­ãƒ¼ã‚«ãƒ«å®Œçµï¼ˆé€ä¿¡ãªã—ï¼‰</span>
                             </span>
                         </div>
-                        <span class="text-xs text-slate-500 font-medium">ƒtƒŒƒbƒNƒXc‹ÆEÏ—§ŠÔŠÇ—</span>
+                        <span class="text-xs text-slate-500 font-medium">ãƒ•ãƒ¬ãƒƒã‚¯ã‚¹æ®‹æ¥­ãƒ»ç©ç«‹æ™‚é–“ç®¡ç†</span>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-2">
                     <button id="btnExport" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center space-x-1">
                         <i class="fa-solid fa-download"></i>
-                        <span class="hidden sm:inline">CSV•Û‘¶</span>
+                        <span class="hidden sm:inline">CSVä¿å­˜</span>
                     </button>
                     <button id="btnSettings" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center space-x-1">
                         <i class="fa-solid fa-gear"></i>
-                        <span class="hidden sm:inline">İ’è</span>
+                        <span class="hidden sm:inline">è¨­å®š</span>
                     </button>
                 </div>
             </div>
@@ -82,22 +82,22 @@
                 <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500 opacity-10 rounded-full blur-2xl pointer-events-none"></div>
                 <div>
                     <div class="flex items-center justify-between text-indigo-200 text-sm font-medium">
-                        <span>—İÏ’´‰ßŠÔic—Êj</span>
-                        <span class="bg-indigo-800/80 text-indigo-200 px-2.5 py-0.5 rounded-full text-xs border border-indigo-700/50">‘SŠúŠÔ’ÊZ</span>
+                        <span>ç´¯ç©è¶…éæ™‚é–“ï¼ˆæ®‹é‡ï¼‰</span>
+                        <span class="bg-indigo-800/80 text-indigo-200 px-2.5 py-0.5 rounded-full text-xs border border-indigo-700/50">å…¨æœŸé–“é€šç®—</span>
                     </div>
                     <div class="mt-4 flex items-baseline space-x-2">
                         <span id="cumulativeHoursText" class="text-4xl sm:text-5xl font-black tracking-tight text-white">+0</span>
-                        <span class="text-lg font-bold text-indigo-200">ŠÔ</span>
-                        <span id="cumulativeMinsText" class="text-2xl font-semibold text-indigo-300">0•ª</span>
+                        <span class="text-lg font-bold text-indigo-200">æ™‚é–“</span>
+                        <span id="cumulativeMinsText" class="text-2xl font-semibold text-indigo-300">0åˆ†</span>
                     </div>
                     <p id="cumulativeStatusSubtext" class="mt-2 text-xs text-indigo-300 flex items-center">
                         <i class="fa-solid fa-circle-info mr-1.5"></i>
-                        1“ú7ŠÔ‹K€‚É‘Î‚·‚éŒ»İ‚Ì’™‹àó‘Ô‚Å‚·
+                        1æ—¥7æ™‚é–“è¦æº–ã«å¯¾ã™ã‚‹ç¾åœ¨ã®è²¯é‡‘çŠ¶æ…‹ã§ã™
                     </p>
                 </div>
                 <div class="mt-4 pt-3 border-t border-indigo-800/60 flex items-center justify-between text-xs text-indigo-200">
-                    <span>Š’èŠÔ: <strong id="standardHoursLabel">7.0</strong>ŠÔ/“ú</span>
-                    <span id="carryoverBadge" class="font-semibold text-emerald-400">ƒvƒ‰ƒX’~Ï’†</span>
+                    <span>æ‰€å®šæ™‚é–“: <strong id="standardHoursLabel">7.0</strong>æ™‚é–“/æ—¥</span>
+                    <span id="carryoverBadge" class="font-semibold text-emerald-400">ãƒ—ãƒ©ã‚¹è“„ç©ä¸­</span>
                 </div>
             </div>
 
@@ -107,27 +107,27 @@
                     <div class="flex items-center justify-between text-slate-500 text-sm font-medium">
                         <div class="flex items-center space-x-2">
                             <button id="btnPrevMonth" class="p-1 hover:bg-slate-100 rounded text-slate-600 transition"><i class="fa-solid fa-chevron-left"></i></button>
-                            <span id="currentMonthYearLabel" class="font-bold text-slate-800 text-base">2026”N 8Œ</span>
+                            <span id="currentMonthYearLabel" class="font-bold text-slate-800 text-base">2026å¹´ 8æœˆ</span>
                             <button id="btnNextMonth" class="p-1 hover:bg-slate-100 rounded text-slate-600 transition"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
-                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">ŒŠÔƒTƒ}ƒŠ[</span>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">æœˆé–“ã‚µãƒãƒªãƒ¼</span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mt-4">
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 block">“–Œ ‘˜J“­ŠÔ</span>
+                            <span class="text-xs text-slate-500 block">å½“æœˆ ç·åŠ´åƒæ™‚é–“</span>
                             <span id="monthTotalHours" class="text-2xl font-bold text-slate-800 mt-1 block">0<span class="text-sm font-normal text-slate-500">h</span></span>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 block">“–Œ ·•ª‡Œv</span>
+                            <span class="text-xs text-slate-500 block">å½“æœˆ å·®åˆ†åˆè¨ˆ</span>
                             <span id="monthDiffHours" class="text-2xl font-bold text-indigo-600 mt-1 block">+0<span class="text-sm font-normal text-slate-500">h</span></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>‹Î–±“ú”: <strong id="monthWorkDaysCount" class="text-slate-800">0</strong> “ú</span>
-                    <span>1“ú•½‹Ï: <strong id="monthAvgHours" class="text-slate-800">0.0</strong> ŠÔ</span>
+                    <span>å‹¤å‹™æ—¥æ•°: <strong id="monthWorkDaysCount" class="text-slate-800">0</strong> æ—¥</span>
+                    <span>1æ—¥å¹³å‡: <strong id="monthAvgHours" class="text-slate-800">0.0</strong> æ™‚é–“</span>
                 </div>
             </div>
 
@@ -137,32 +137,32 @@
                     <div class="flex items-center justify-between text-slate-500 text-sm font-medium mb-2">
                         <span class="font-bold text-slate-800 flex items-center gap-1.5">
                             <i class="fa-solid fa-bolt text-amber-500"></i>
-                            “–“ú‚ÌŠÔ’²®i30•ª’PˆÊj
+                            å½“æ—¥ã®æ™‚é–“èª¿æ•´ï¼ˆ30åˆ†å˜ä½ï¼‰
                         </span>
-                        <span class="text-[11px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full border border-indigo-100">ƒNƒCƒbƒN“o˜^</span>
+                        <span class="text-[11px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full border border-indigo-100">ã‚¯ã‚¤ãƒƒã‚¯ç™»éŒ²</span>
                     </div>
                     
                     <!-- Date Selector -->
                     <div class="bg-slate-50 p-2 rounded-lg mt-1 mb-3 border border-slate-100 flex items-center space-x-2">
                         <i class="fa-regular fa-calendar text-slate-400 pl-1"></i>
-                        <input type="date" id="quickDateInput" class="w-full bg-transparent border-none text-xs sm:text-sm text-slate-700 font-bold focus:outline-none focus:ring-0 p-0" title="‹L˜^‚·‚é“ú•t‚ğ‘I‘ğ">
+                        <input type="date" id="quickDateInput" class="w-full bg-transparent border-none text-xs sm:text-sm text-slate-700 font-bold focus:outline-none focus:ring-0 p-0" title="è¨˜éŒ²ã™ã‚‹æ—¥ä»˜ã‚’é¸æŠ">
                     </div>
 
                     <!-- 30-Minute Stepper Display -->
                     <div class="bg-indigo-50/70 border border-indigo-100/80 rounded-xl p-3 mb-3 text-center">
-                        <div class="text-xs text-indigo-700 font-medium mb-1">Š’è7ŠÔ‚É‘Î‚·‚é’´‰ß/•s‘«</div>
+                        <div class="text-xs text-indigo-700 font-medium mb-1">æ‰€å®š7æ™‚é–“ã«å¯¾ã™ã‚‹è¶…é/ä¸è¶³</div>
                         
                         <div class="flex items-center justify-center space-x-3 my-1">
-                            <button type="button" id="btnQuickMinus" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-lg flex items-center justify-center shadow-sm active:scale-95 transition" title="30•ªŒ¸‚ç‚·">
+                            <button type="button" id="btnQuickMinus" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-lg flex items-center justify-center shadow-sm active:scale-95 transition" title="30åˆ†æ¸›ã‚‰ã™">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
                             
                             <div class="min-w-[120px]">
                                 <span id="quickDeltaDisplay" class="text-2xl font-black text-indigo-900 tracking-tight">+0.0h</span>
-                                <div id="quickTotalHoursDisplay" class="text-[11px] font-semibold text-indigo-600">À˜J“­: 7.0ŠÔ</div>
+                                <div id="quickTotalHoursDisplay" class="text-[11px] font-semibold text-indigo-600">å®ŸåŠ´åƒ: 7.0æ™‚é–“</div>
                             </div>
 
-                            <button type="button" id="btnQuickPlus" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-lg flex items-center justify-center shadow-sm active:scale-95 transition" title="30•ª‘‚â‚·">
+                            <button type="button" id="btnQuickPlus" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-lg flex items-center justify-center shadow-sm active:scale-95 transition" title="30åˆ†å¢—ã‚„ã™">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -174,23 +174,23 @@
                         <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="1.5">+1.5h</button>
                         <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="1.0">+1.0h</button>
                         <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="0.5">+0.5h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="0">}0h(’è)</button>
+                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="0">Â±0h(å®šæ™‚)</button>
                         <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="-0.5">-0.5h</button>
                         <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="-1.0">-1.0h</button>
                         <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="-2.0">-2.0h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800 font-medium transition" data-delta="-7.0">‘S‹x(-7h)</button>
+                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800 font-medium transition" data-delta="-7.0">å…¨ä¼‘(-7h)</button>
                     </div>
 
                     <!-- Quick Submit Button -->
                     <button id="btnQuickSubmit" type="button" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md shadow-indigo-100 flex items-center justify-center space-x-1.5">
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>‚±‚ÌŠÔ‚Åƒƒ“ƒ^ƒbƒv‹L˜^</span>
+                        <span>ã“ã®æ™‚é–“ã§ãƒ¯ãƒ³ã‚¿ãƒƒãƒ—è¨˜éŒ²</span>
                     </button>
                 </div>
 
                 <button id="btnOpenModal" class="w-full mt-3 py-1.5 text-xs text-slate-500 hover:text-indigo-600 font-medium transition flex items-center justify-center space-x-1">
                     <i class="fa-regular fa-clock"></i>
-                    <span>‘Å‚âÚ×‚È‹L˜^‚Í‚±‚¿‚ç</span>
+                    <span>æ™‚åˆ»æ‰“åˆ»ã‚„è©³ç´°ãªè¨˜éŒ²ã¯ã“ã¡ã‚‰</span>
                 </button>
             </div>
         </section>
@@ -201,12 +201,12 @@
                 <div>
                     <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
                         <i class="fa-solid fa-list-check text-indigo-600"></i>
-                        <span>“ú•Ê‹Î–±E’´‰ßÀÑˆê——</span>
+                        <span>æ—¥åˆ¥å‹¤å‹™ãƒ»è¶…éå®Ÿç¸¾ä¸€è¦§</span>
                     </h2>
-                    <p class="text-xs text-slate-500">‘I‘ğ’†‚ÌŒ‚ÌÀ“­ŠÔ‚ÆcŠz‚Ì‘JˆÚ—š—ğ</p>
+                    <p class="text-xs text-slate-500">é¸æŠä¸­ã®æœˆã®å®Ÿåƒæ™‚é–“ã¨æ®‹é¡ã®é·ç§»å±¥æ­´</p>
                 </div>
                 <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <input type="text" id="searchInput" placeholder="ƒƒ‚‚â“ú•t‚ÅŒŸõ..." class="w-full sm:w-48 text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="searchInput" placeholder="ãƒ¡ãƒ¢ã‚„æ—¥ä»˜ã§æ¤œç´¢..." class="w-full sm:w-48 text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
             </div>
 
@@ -215,14 +215,14 @@
                 <table class="w-full text-left text-sm text-slate-600">
                     <thead class="bg-slate-50 text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
                         <tr>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">“ú•t</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">‹æ•ª</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">‹Î–±ŠÔ</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">À˜J“­ŠÔ</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">“–“ú‚Ì·•ª</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">—İÏcc—Ê</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">ƒƒ‚</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold text-right">‘€ì</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">æ—¥ä»˜</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">åŒºåˆ†</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">å‹¤å‹™æ™‚é–“</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">å®ŸåŠ´åƒæ™‚é–“</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">å½“æ—¥ã®å·®åˆ†</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">ç´¯ç©æ®‹æ®‹é‡</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold">ãƒ¡ãƒ¢</th>
+                            <th scope="col" class="py-3.5 px-4 font-semibold text-right">æ“ä½œ</th>
                         </tr>
                     </thead>
                     <tbody id="workLogTableBody" class="divide-y divide-slate-100 font-medium">
@@ -234,7 +234,7 @@
             <!-- Empty State -->
             <div id="emptyState" class="hidden py-12 text-center text-slate-400">
                 <i class="fa-regular fa-calendar-xmark text-4xl mb-3 block"></i>
-                <p class="text-sm">ƒf[ƒ^‚ª‚ ‚è‚Ü‚¹‚ñBuƒNƒCƒbƒN‹L˜^v‚Ü‚½‚ÍuÚ×‚ğ“ü—Ív‚©‚ç’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢B</p>
+                <p class="text-sm">ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚Šã¾ã›ã‚“ã€‚ã€Œã‚¯ã‚¤ãƒƒã‚¯è¨˜éŒ²ã€ã¾ãŸã¯ã€Œè©³ç´°ã‚’å…¥åŠ›ã€ã‹ã‚‰è¿½åŠ ã—ã¦ãã ã•ã„ã€‚</p>
             </div>
         </section>
 
@@ -246,7 +246,7 @@
             <div class="bg-indigo-600 px-6 py-4 text-white flex justify-between items-center">
                 <h3 id="modalTitle" class="font-bold text-base flex items-center space-x-2">
                     <i class="fa-solid fa-pen-to-square"></i>
-                    <span>‹Î–±ÀÑ‚Ì“ü—Í</span>
+                    <span>å‹¤å‹™å®Ÿç¸¾ã®å…¥åŠ›</span>
                 </h3>
                 <button id="btnCloseModal" class="text-indigo-200 hover:text-white transition text-lg">&times;</button>
             </div>
@@ -256,16 +256,16 @@
 
                 <!-- Date selection -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">“ú•t</label>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">æ—¥ä»˜</label>
                     <input type="date" id="inputDate" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <!-- Input Type Switch -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">“ü—Í•û®</label>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">å…¥åŠ›æ–¹å¼</label>
                     <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-lg">
-                        <button type="button" id="tabDirect" class="py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-indigo-600">ŠÔi‰½ŠÔj‚Åw’è</button>
-                        <button type="button" id="tabClock" class="py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:text-slate-800">i‘Åj‚ÅŒvZ</button>
+                        <button type="button" id="tabDirect" class="py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-indigo-600">æ™‚é–“ï¼ˆä½•æ™‚é–“ï¼‰ã§æŒ‡å®š</button>
+                        <button type="button" id="tabClock" class="py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:text-slate-800">æ™‚åˆ»ï¼ˆæ‰“åˆ»ï¼‰ã§è¨ˆç®—</button>
                     </div>
                 </div>
 
@@ -273,14 +273,14 @@
                 <div id="directHoursSection" class="space-y-3">
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-semibold text-slate-700">À˜J“­ŠÔiŠÔj</label>
-                            <span class="text-xs text-indigo-600 font-bold" id="calculatedDiffDirect">+0ŠÔ</span>
+                            <label class="text-xs font-semibold text-slate-700">å®ŸåŠ´åƒæ™‚é–“ï¼ˆæ™‚é–“ï¼‰</label>
+                            <span class="text-xs text-indigo-600 font-bold" id="calculatedDiffDirect">+0æ™‚é–“</span>
                         </div>
                         <div class="flex items-center space-x-2">
                             <input type="number" id="inputHours" step="0.25" min="0" max="24" placeholder="7" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
-                            <span class="text-sm text-slate-500">ŠÔ</span>
+                            <span class="text-sm text-slate-500">æ™‚é–“</span>
                         </div>
-                        <p class="text-[11px] text-slate-400 mt-1">¦ 1“ú•W€ <span class="standardHoursInline">7</span> ŠÔ‚Æ‚Ì·•ª‚ª’´‰ßŠÔ‚Æ‚µ‚ÄÏ‚İ—§‚Ä‚ç‚ê‚Ü‚·B</p>
+                        <p class="text-[11px] text-slate-400 mt-1">â€» 1æ—¥æ¨™æº– <span class="standardHoursInline">7</span> æ™‚é–“ã¨ã®å·®åˆ†ãŒè¶…éæ™‚é–“ã¨ã—ã¦ç©ã¿ç«‹ã¦ã‚‰ã‚Œã¾ã™ã€‚</p>
                     </div>
                 </div>
 
@@ -288,34 +288,34 @@
                 <div id="clockTimeSection" class="hidden space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">o‹Îin‹Æj</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">å‡ºå‹¤ï¼ˆå§‹æ¥­ï¼‰</label>
                             <input type="time" id="inputStartTime" value="09:00" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">‘Ş‹ÎiI‹Æj</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">é€€å‹¤ï¼ˆçµ‚æ¥­ï¼‰</label>
                             <input type="time" id="inputEndTime" value="17:00" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">‹xŒeŠÔiŠÔj</label>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">ä¼‘æ†©æ™‚é–“ï¼ˆæ™‚é–“ï¼‰</label>
                         <input type="number" id="inputBreakHours" step="0.25" min="0" value="1.0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div class="bg-indigo-50 p-2.5 rounded-lg flex justify-between items-center text-xs">
-                        <span class="text-indigo-900 font-medium">ŒvZŒã‚ÌÀ˜J“­ŠÔ: <strong id="clockCalculatedHours" class="text-indigo-700 font-bold">7.0ŠÔ</strong></span>
+                        <span class="text-indigo-900 font-medium">è¨ˆç®—å¾Œã®å®ŸåŠ´åƒæ™‚é–“: <strong id="clockCalculatedHours" class="text-indigo-700 font-bold">7.0æ™‚é–“</strong></span>
                         <span id="clockCalculatedDiff" class="font-bold text-indigo-600">0.0h</span>
                     </div>
                 </div>
 
                 <!-- Memo -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">ƒƒ‚ / ‹Æ–±“à—e</label>
-                    <input type="text" id="inputMemo" placeholder="—á: ƒvƒƒWƒFƒNƒg‘Î‰A‘‘Ş‚È‚Ç" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">ãƒ¡ãƒ¢ / æ¥­å‹™å†…å®¹</label>
+                    <input type="text" id="inputMemo" placeholder="ä¾‹: ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆå¯¾å¿œã€æ—©é€€ãªã©" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <!-- Buttons -->
                 <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
-                    <button type="button" id="btnCancelModal" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">ƒLƒƒƒ“ƒZƒ‹</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition shadow-md shadow-indigo-100">•Û‘¶‚·‚é</button>
+                    <button type="button" id="btnCancelModal" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">ã‚­ãƒ£ãƒ³ã‚»ãƒ«</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition shadow-md shadow-indigo-100">ä¿å­˜ã™ã‚‹</button>
                 </div>
             </form>
         </div>
@@ -327,7 +327,7 @@
             <div class="bg-slate-800 px-6 py-4 text-white flex justify-between items-center shrink-0">
                 <h3 class="font-bold text-base flex items-center space-x-2">
                     <i class="fa-solid fa-gear"></i>
-                    <span>İ’è</span>
+                    <span>è¨­å®š</span>
                 </h3>
                 <button id="btnCloseSettings" class="text-slate-400 hover:text-white transition text-lg">&times;</button>
             </div>
@@ -335,43 +335,43 @@
             <div class="p-6 space-y-5 text-sm flex-1">
                 <!-- Standard Hours Setting -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">1“ú‚ÌŠ’è˜J“­ŠÔiŠÔj</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">1æ—¥ã®æ‰€å®šåŠ´åƒæ™‚é–“ï¼ˆæ™‚é–“ï¼‰</label>
                     <div class="flex items-center space-x-2">
                         <input type="number" id="settingStandardHours" step="0.5" min="1" max="12" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
-                        <span class="text-xs text-slate-500">ŠÔ</span>
+                        <span class="text-xs text-slate-500">æ™‚é–“</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-1">¦ ƒfƒtƒHƒ‹ƒg‚Í7ŠÔ‚Å‚·B</p>
+                    <p class="text-[11px] text-slate-400 mt-1">â€» ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯7æ™‚é–“ã§ã™ã€‚</p>
                 </div>
 
                 <!-- Privacy Guarantee Note -->
                 <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start space-x-2">
                     <i class="fa-solid fa-shield-halved text-emerald-600 text-base mt-0.5 shrink-0"></i>
                     <div>
-                        <strong class="font-bold block">Š®‘Sƒ[ƒJƒ‹E’ÊM‚È‚µƒZƒLƒ…ƒŠƒeƒB•ÛØ</strong>
-                        <span>“ü—Í‚³‚ê‚½ƒf[ƒ^‚âİ’è‚ÍŠO•”ƒT[ƒo[‚Ö‘—M‚³‚ê‚Ü‚¹‚ñB‚·‚×‚Ä‚¨g‚¢‚Ìƒuƒ‰ƒEƒUiƒ[ƒJƒ‹j“à‚ÉˆÀ‘S‚É•ÛŠÇ‚³‚ê‚Ü‚·B</span>
+                        <strong class="font-bold block">å®Œå…¨ãƒ­ãƒ¼ã‚«ãƒ«ãƒ»é€šä¿¡ãªã—ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£ä¿è¨¼</strong>
+                        <span>å…¥åŠ›ã•ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã‚„è¨­å®šã¯å¤–éƒ¨ã‚µãƒ¼ãƒãƒ¼ã¸é€ä¿¡ã•ã‚Œã¾ã›ã‚“ã€‚ã™ã¹ã¦ãŠä½¿ã„ã®ãƒ–ãƒ©ã‚¦ã‚¶ï¼ˆãƒ­ãƒ¼ã‚«ãƒ«ï¼‰å†…ã«å®‰å…¨ã«ä¿ç®¡ã•ã‚Œã¾ã™ã€‚</span>
                     </div>
                 </div>
 
                 <!-- Data Management -->
                 <div class="pt-3 border-t border-slate-200">
-                    <label class="block text-xs font-semibold text-slate-700 mb-2">ƒf[ƒ^ŠÇ—</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-2">ãƒ‡ãƒ¼ã‚¿ç®¡ç†</label>
                     <div class="grid grid-cols-2 gap-2">
                         <button id="btnImportTrigger" type="button" class="py-2 px-3 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-file-import"></i>
-                            <span>CSV‚©‚ç•œŒ³</span>
+                            <span>CSVã‹ã‚‰å¾©å…ƒ</span>
                         </button>
                         <input type="file" id="csvFileInput" accept=".csv" class="hidden">
 
                         <button id="btnClearData" type="button" class="py-2 px-3 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-trash-can"></i>
-                            <span>‘Sƒf[ƒ^Á‹</span>
+                            <span>å…¨ãƒ‡ãƒ¼ã‚¿æ¶ˆå»</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
-                <button id="btnSaveSettings" class="px-5 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition">İ’è‚ğ•Û‘¶‚·‚é</button>
+                <button id="btnSaveSettings" class="px-5 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition">è¨­å®šã‚’ä¿å­˜ã™ã‚‹</button>
             </div>
         </div>
     </div>
@@ -382,11 +382,11 @@
             <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 id="confirmTitle" class="text-base font-bold text-slate-800 mb-2">Šm”F</h3>
-            <p id="confirmMessage" class="text-xs text-slate-500 mb-6">–{“–‚ÉÀs‚µ‚Ü‚·‚©H</p>
+            <h3 id="confirmTitle" class="text-base font-bold text-slate-800 mb-2">ç¢ºèª</h3>
+            <p id="confirmMessage" class="text-xs text-slate-500 mb-6">æœ¬å½“ã«å®Ÿè¡Œã—ã¾ã™ã‹ï¼Ÿ</p>
             <div class="flex space-x-3 justify-center">
-                <button id="btnConfirmCancel" class="w-1/2 py-2 px-4 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">ƒLƒƒƒ“ƒZƒ‹</button>
-                <button id="btnConfirmOk" class="w-1/2 py-2 px-4 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition shadow-md shadow-red-200">íœ‚·‚é</button>
+                <button id="btnConfirmCancel" class="w-1/2 py-2 px-4 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">ã‚­ãƒ£ãƒ³ã‚»ãƒ«</button>
+                <button id="btnConfirmOk" class="w-1/2 py-2 px-4 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition shadow-md shadow-red-200">å‰Šé™¤ã™ã‚‹</button>
             </div>
         </div>
     </div>
@@ -394,7 +394,7 @@
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center space-x-2">
         <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toastMessage">ƒƒbƒZ[ƒW</span>
+        <span id="toastMessage">ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸</span>
     </div>
 
     <script>
@@ -482,7 +482,7 @@
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
             updateSettingsUI();
             renderAll();
-            showToast('İ’è‚ğ•Û‘¶‚µ‚Ü‚µ‚½');
+            showToast('è¨­å®šã‚’ä¿å­˜ã—ã¾ã—ãŸ');
         }
 
         function updateSettingsUI() {
@@ -519,14 +519,14 @@
                     date: `${year}-${month}-01`,
                     hours: 9.0,
                     mode: 'direct',
-                    memo: 'ƒvƒƒWƒFƒNƒgŠJ”­‘Å‡‚¹ic‹Æ2hj'
+                    memo: 'ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆé–‹ç™ºæ‰“åˆã›ï¼ˆæ®‹æ¥­2hï¼‰'
                 },
                 {
                     id: 'sample-2',
                     date: `${year}-${month}-03`,
                     hours: 6.0,
                     mode: 'direct',
-                    memo: '’Ê‰@‚Ì‚½‚ß‘‘Şi1hÁ‰»j'
+                    memo: 'é€šé™¢ã®ãŸã‚æ—©é€€ï¼ˆ1hæ¶ˆåŒ–ï¼‰'
                 }
             ];
             saveData();
@@ -574,23 +574,23 @@
             if (totalCumulative >= 0) {
                 cumulativeHoursText.textContent = `${formattedCum.sign}${formattedCum.h}`;
                 cumulativeHoursText.className = "text-4xl sm:text-5xl font-black tracking-tight text-emerald-400";
-                cumulativeMinsText.textContent = `${formattedCum.m}•ª`;
-                cumulativeStatusSubtext.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i>ƒtƒŒƒbƒNƒX’™‹ài’´‰ß•ªj‚ªèŒ³‚É‚ ‚è‚Ü‚·`;
-                carryoverBadge.textContent = "ƒvƒ‰ƒX’~Ï’†";
+                cumulativeMinsText.textContent = `${formattedCum.m}åˆ†`;
+                cumulativeStatusSubtext.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i>ãƒ•ãƒ¬ãƒƒã‚¯ã‚¹è²¯é‡‘ï¼ˆè¶…éåˆ†ï¼‰ãŒæ‰‹å…ƒã«ã‚ã‚Šã¾ã™`;
+                carryoverBadge.textContent = "ãƒ—ãƒ©ã‚¹è“„ç©ä¸­";
                 carryoverBadge.className = "font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50";
             } else {
                 cumulativeHoursText.textContent = `${formattedCum.sign}${formattedCum.h}`;
                 cumulativeHoursText.className = "text-4xl sm:text-5xl font-black tracking-tight text-amber-400";
-                cumulativeMinsText.textContent = `${formattedCum.m}•ª`;
-                cumulativeStatusSubtext.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1.5"></i>•W€˜J“­ŠÔ‚æ‚è•s‘«‚µ‚Ä‚¢‚Ü‚·i¸Z‘ÎÛj`;
-                carryoverBadge.textContent = "ƒ}ƒCƒiƒX•s‘«’†";
+                cumulativeMinsText.textContent = `${formattedCum.m}åˆ†`;
+                cumulativeStatusSubtext.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1.5"></i>æ¨™æº–åŠ´åƒæ™‚é–“ã‚ˆã‚Šä¸è¶³ã—ã¦ã„ã¾ã™ï¼ˆç²¾ç®—å¯¾è±¡ï¼‰`;
+                carryoverBadge.textContent = "ãƒã‚¤ãƒŠã‚¹ä¸è¶³ä¸­";
                 carryoverBadge.className = "font-semibold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/50";
             }
 
             // 2. Monthly Summary
             const targetYear = currentViewDate.getFullYear();
             const targetMonth = currentViewDate.getMonth();
-            currentMonthYearLabel.textContent = `${targetYear}”N ${targetMonth + 1}Œ`;
+            currentMonthYearLabel.textContent = `${targetYear}å¹´ ${targetMonth + 1}æœˆ`;
 
             const monthData = enrichedData.filter(d => {
                 const dt = new Date(d.date);
@@ -635,11 +635,11 @@
                 deltaDisplay.textContent = `${fmt.sign}${fmt.h}h ${fmt.m > 0 ? fmt.m + 'm' : ''}`;
                 deltaDisplay.className = "text-2xl font-black text-amber-600 tracking-tight";
             } else {
-                deltaDisplay.textContent = "}0ŠÔ";
+                deltaDisplay.textContent = "Â±0æ™‚é–“";
                 deltaDisplay.className = "text-2xl font-black text-slate-700 tracking-tight";
             }
 
-            totalDisplay.textContent = `À˜J“­ŠÔ: ${totalHours.toFixed(1)}ŠÔ`;
+            totalDisplay.textContent = `å®ŸåŠ´åƒæ™‚é–“: ${totalHours.toFixed(1)}æ™‚é–“`;
 
             // Highlight active chip if matching
             document.querySelectorAll('.quickChip').forEach(chip => {
@@ -673,7 +673,7 @@
                 tr.className = "hover:bg-slate-50/80 transition-colors";
 
                 const dateObj = new Date(item.date);
-                const dayOfWeek = ['“ú', 'Œ', '‰Î', '…', '–Ø', '‹à', '“y'][dateObj.getDay()];
+                const dayOfWeek = ['æ—¥', 'æœˆ', 'ç«', 'æ°´', 'æœ¨', 'é‡‘', 'åœŸ'][dateObj.getDay()];
                 const dayClass = dateObj.getDay() === 0 ? 'text-red-500 font-bold' : (dateObj.getDay() === 6 ? 'text-blue-500 font-bold' : 'text-slate-700');
 
                 const diffFormatted = formatHoursAndMins(item.diff);
@@ -691,15 +691,15 @@
                     </td>
                     <td class="py-3 px-4 whitespace-nowrap text-xs">
                         ${item.hours === 0 
-                            ? '<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">‚¨‹x‚İ</span>' 
-                            : '<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">o‹Î</span>'}
+                            ? '<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">ãŠä¼‘ã¿</span>' 
+                            : '<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">å‡ºå‹¤</span>'}
                     </td>
                     <td class="py-3 px-4 whitespace-nowrap text-xs text-slate-500">
-                        ${item.mode === 'clock' && item.startTime ? `${item.startTime} - ${item.endTime} (‹x${item.breakHours || 1}h)` : '’¼Úw’è'}
+                        ${item.mode === 'clock' && item.startTime ? `${item.startTime} - ${item.endTime} (ä¼‘${item.breakHours || 1}h)` : 'ç›´æ¥æŒ‡å®š'}
                     </td>
                     <td class="py-3 px-4 whitespace-nowrap">
                         <span class="text-slate-800 font-bold">${item.hours.toFixed(1)}</span>
-                        <span class="text-xs text-slate-400">ŠÔ</span>
+                        <span class="text-xs text-slate-400">æ™‚é–“</span>
                     </td>
                     <td class="py-3 px-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${diffBadgeClass}">
@@ -708,17 +708,17 @@
                     </td>
                     <td class="py-3 px-4 whitespace-nowrap">
                         <span class="${cumColorClass} text-xs">
-                            ${cumFormatted.sign}${cumFormatted.h}ŠÔ${cumFormatted.m}•ª
+                            ${cumFormatted.sign}${cumFormatted.h}æ™‚é–“${cumFormatted.m}åˆ†
                         </span>
                     </td>
                     <td class="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
                         ${item.memo || '-'}
                     </td>
                     <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
-                        <button onclick="editEntry('${item.id}')" class="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 transition" title="•ÒW">
+                        <button onclick="editEntry('${item.id}')" class="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 transition" title="ç·¨é›†">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button onclick="deleteEntry('${item.id}')" class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition" title="íœ">
+                        <button onclick="deleteEntry('${item.id}')" class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition" title="å‰Šé™¤">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -770,7 +770,7 @@
                 const h = parseFloat(inputHours.value) || 0;
                 const diff = h - settings.standardHours;
                 const fmt = formatHoursAndMins(diff);
-                calculatedDiffDirect.textContent = `${fmt.sign}${fmt.h}h ${fmt.m}m (·•ª)`;
+                calculatedDiffDirect.textContent = `${fmt.sign}${fmt.h}h ${fmt.m}m (å·®åˆ†)`;
                 calculatedDiffDirect.className = `text-xs font-bold ${diff >= 0 ? 'text-indigo-600' : 'text-amber-600'}`;
             });
 
@@ -802,7 +802,7 @@
 
                 addOrUpdateEntry(entry);
                 closeEntryModal();
-                showToast('‹Î–±ÀÑ‚ğ•Û‘¶‚µ‚Ü‚µ‚½');
+                showToast('å‹¤å‹™å®Ÿç¸¾ã‚’ä¿å­˜ã—ã¾ã—ãŸ');
             });
 
             // Settings Modal
@@ -830,11 +830,11 @@
             document.getElementById('csvFileInput').addEventListener('change', importFromCSV);
 
             document.getElementById('btnClearData').addEventListener('click', () => {
-                showConfirm('‘Sƒf[ƒ^Á‹', '‚·‚×‚Ä‚Ì“o˜^ƒf[ƒ^‚ğƒNƒŠƒA‚µ‚Ä‚à‚æ‚ë‚µ‚¢‚Å‚·‚©H‚±‚Ì‘€ì‚Íæ‚èÁ‚¹‚Ü‚¹‚ñB', () => {
+                showConfirm('å…¨ãƒ‡ãƒ¼ã‚¿æ¶ˆå»', 'ã™ã¹ã¦ã®ç™»éŒ²ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªã‚¢ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿã“ã®æ“ä½œã¯å–ã‚Šæ¶ˆã›ã¾ã›ã‚“ã€‚', () => {
                     appData = [];
                     saveData();
                     closeSettingsModal();
-                    showToast('ƒf[ƒ^‚ğ‘Síœ‚µ‚Ü‚µ‚½');
+                    showToast('ãƒ‡ãƒ¼ã‚¿ã‚’å…¨å‰Šé™¤ã—ã¾ã—ãŸ');
                 });
             });
 
@@ -874,11 +874,11 @@
                 const finalHours = Math.max(0, settings.standardHours + currentQuickDelta);
 
                 let defaultMemo = '';
-                if (currentQuickDelta > 0) defaultMemo = `c‹Æ +${currentQuickDelta}ŠÔ`;
+                if (currentQuickDelta > 0) defaultMemo = `æ®‹æ¥­ +${currentQuickDelta}æ™‚é–“`;
                 else if (currentQuickDelta < 0) {
-                    if (finalHours === 0) defaultMemo = '‘S‹x';
-                    else defaultMemo = `ŠÔ’Zk ${currentQuickDelta}ŠÔ`;
-                } else defaultMemo = '’è‹Î–±';
+                    if (finalHours === 0) defaultMemo = 'å…¨ä¼‘';
+                    else defaultMemo = `æ™‚é–“çŸ­ç¸® ${currentQuickDelta}æ™‚é–“`;
+                } else defaultMemo = 'å®šæ™‚å‹¤å‹™';
 
                 addOrUpdateEntry({
                     id: 'entry-' + Date.now(),
@@ -889,13 +889,13 @@
                 });
 
                 const fmt = formatHoursAndMins(currentQuickDelta);
-                showToast(`${targetDateStr} ‚É À˜J“­ ${finalHours.toFixed(1)}h (${fmt.sign}${fmt.h}h${fmt.m ? fmt.m+'m' : ''}) ‚ğ‹L˜^‚µ‚Ü‚µ‚½`);
+                showToast(`${targetDateStr} ã« å®ŸåŠ´åƒ ${finalHours.toFixed(1)}h (${fmt.sign}${fmt.h}h${fmt.m ? fmt.m+'m' : ''}) ã‚’è¨˜éŒ²ã—ã¾ã—ãŸ`);
             });
         }
 
         function recalculateClockMode() {
             const calculated = calculateHoursFromClock(inputStartTime.value, inputEndTime.value, parseFloat(inputBreakHours.value) || 0);
-            clockCalculatedHours.textContent = `${calculated.toFixed(1)}ŠÔ`;
+            clockCalculatedHours.textContent = `${calculated.toFixed(1)}æ™‚é–“`;
 
             const diff = calculated - settings.standardHours;
             const fmt = formatHoursAndMins(diff);
@@ -954,18 +954,18 @@
                 tabDirect.click();
             }
 
-            openEntryModal('‹Î–±ÀÑ‚Ì•ÒW');
+            openEntryModal('å‹¤å‹™å®Ÿç¸¾ã®ç·¨é›†');
         }
 
         function deleteEntry(id) {
-            showConfirm('‹L˜^‚Ìíœ', '‚±‚Ì‹L˜^‚ğíœ‚µ‚Ä‚à‚æ‚ë‚µ‚¢‚Å‚·‚©H', () => {
+            showConfirm('è¨˜éŒ²ã®å‰Šé™¤', 'ã“ã®è¨˜éŒ²ã‚’å‰Šé™¤ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ', () => {
                 appData = appData.filter(item => item.id !== id);
                 saveData();
-                showToast('‹L˜^‚ğíœ‚µ‚Ü‚µ‚½');
+                showToast('è¨˜éŒ²ã‚’å‰Šé™¤ã—ã¾ã—ãŸ');
             });
         }
 
-        function openEntryModal(title = '‹Î–±ÀÑ‚Ì“ü—Í') {
+        function openEntryModal(title = 'å‹¤å‹™å®Ÿç¸¾ã®å…¥åŠ›') {
             if (!editEntryId.value && quickDateInput) {
                 inputDate.value = quickDateInput.value;
             }
@@ -998,11 +998,11 @@
 
         function exportToCSV() {
             if (appData.length === 0) {
-                showToast('ƒGƒNƒXƒ|[ƒg‚·‚éƒf[ƒ^‚ª‚ ‚è‚Ü‚¹‚ñ');
+                showToast('ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã™ã‚‹ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚Šã¾ã›ã‚“');
                 return;
             }
 
-            const headers = ['“ú•t', 'À˜J“­ŠÔ', 'n‹Æ', 'I‹Æ', '‹xŒe', 'ƒƒ‚'];
+            const headers = ['æ—¥ä»˜', 'å®ŸåŠ´åƒæ™‚é–“', 'å§‹æ¥­', 'çµ‚æ¥­', 'ä¼‘æ†©', 'ãƒ¡ãƒ¢'];
             const rows = appData.map(item => [
                 item.date,
                 item.hours,
@@ -1020,7 +1020,7 @@
             a.download = `FlexTime_Data_${getTodayString()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('CSVƒtƒ@ƒCƒ‹‚ğ•Û‘¶‚µ‚Ü‚µ‚½');
+            showToast('CSVãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¿å­˜ã—ã¾ã—ãŸ');
         }
 
         function importFromCSV(e) {
@@ -1058,12 +1058,12 @@
                         appData = newEntries;
                         saveData();
                         closeSettingsModal();
-                        showToast(`${newEntries.length}Œ‚Ìƒf[ƒ^‚ğƒCƒ“ƒ|[ƒg‚µ‚Ü‚µ‚½`);
+                        showToast(`${newEntries.length}ä»¶ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆã—ã¾ã—ãŸ`);
                     } else {
-                        showToast('—LŒø‚Èƒf[ƒ^‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½');
+                        showToast('æœ‰åŠ¹ãªãƒ‡ãƒ¼ã‚¿ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ');
                     }
                 } catch(err) {
-                    showToast('CSV‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+                    showToast('CSVã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸ');
                 }
             };
             reader.readAsText(file);
