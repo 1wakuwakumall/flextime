@@ -2,1111 +2,415 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlexTime - フレックス残業・時間管理</title>
-    <!-- 
-        【プライバシー・データセキュリティ保証】
-        本アプリは完全ローカル（オフライン対応）で動作します。
-        入力データや設定情報はすべてお使いのブラウザ（localStorage）にのみ保存され、
-        外部のサーバーへ通信・送信される処理は一切存在しません。
-    -->
-    <!-- Tailwind CSS (デザイン用静的ライブラリ) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="フレックス管理">
+    <title>フレックスタイム時間管理</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome (アイコン用) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Noto Sans JP', 'Inter', sans-serif;
-            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        input, textarea {
+            user-select: text;
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
 
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md shadow-indigo-100 flex items-center justify-center">
-                        <i class="fa-solid fa-clock-rotate-left text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h1 class="text-xl font-bold text-slate-900 tracking-tight leading-none">FlexTime</h1>
-                            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200 flex items-center space-x-1">
-                                <i class="fa-solid fa-shield-halved text-xs"></i>
-                                <span>ローカル完結（送信なし）</span>
-                            </span>
-                        </div>
-                        <span class="text-xs text-slate-500 font-medium">フレックス残業・積立時間管理</span>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <button id="btnExport" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center space-x-1">
-                        <i class="fa-solid fa-download"></i>
-                        <span class="hidden sm:inline">CSV保存</span>
-                    </button>
-                    <button id="btnSettings" class="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center space-x-1">
-                        <i class="fa-solid fa-gear"></i>
-                        <span class="hidden sm:inline">設定</span>
-                    </button>
-                </div>
+    <header class="bg-indigo-600 text-white pt-10 pb-6 px-4 shadow-md sticky top-0 z-10">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold tracking-wide">フレックス時間管理</h1>
+                <p class="text-xs text-indigo-200 mt-0.5">1日7時間標準（30分単位調整）</p>
             </div>
+            <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-indigo-500 transition text-indigo-100" title="設定・バックアップ">
+                ⚙️
+            </button>
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
 
-        <!-- Upper Summary / KPI Dashboard -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <!-- 1. Total Carryover / Cumulative Excess -->
-            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
-                <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500 opacity-10 rounded-full blur-2xl pointer-events-none"></div>
-                <div>
-                    <div class="flex items-center justify-between text-indigo-200 text-sm font-medium">
-                        <span>累積超過時間（残量）</span>
-                        <span class="bg-indigo-800/80 text-indigo-200 px-2.5 py-0.5 rounded-full text-xs border border-indigo-700/50">全期間通算</span>
-                    </div>
-                    <div class="mt-4 flex items-baseline space-x-2">
-                        <span id="cumulativeHoursText" class="text-4xl sm:text-5xl font-black tracking-tight text-white">+0</span>
-                        <span class="text-lg font-bold text-indigo-200">時間</span>
-                        <span id="cumulativeMinsText" class="text-2xl font-semibold text-indigo-300">0分</span>
-                    </div>
-                    <p id="cumulativeStatusSubtext" class="mt-2 text-xs text-indigo-300 flex items-center">
-                        <i class="fa-solid fa-circle-info mr-1.5"></i>
-                        1日7時間規準に対する現在の貯金状態です
-                    </p>
+        <!-- Summary Card -->
+        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">通算超過 / 不足時間</h2>
+            <div class="flex items-baseline justify-between">
+                <div id="totalBadge" class="text-3xl font-extrabold tracking-tight text-slate-900">
+                    0時間00分
                 </div>
-                <div class="mt-4 pt-3 border-t border-indigo-800/60 flex items-center justify-between text-xs text-indigo-200">
-                    <span>所定時間: <strong id="standardHoursLabel">7.0</strong>時間/日</span>
-                    <span id="carryoverBadge" class="font-semibold text-emerald-400">プラス蓄積中</span>
-                </div>
+                <span id="statusLabel" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                    ±0
+                </span>
             </div>
-
-            <!-- 2. Monthly Summary -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between text-slate-500 text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <button id="btnPrevMonth" class="p-1 hover:bg-slate-100 rounded text-slate-600 transition"><i class="fa-solid fa-chevron-left"></i></button>
-                            <span id="currentMonthYearLabel" class="font-bold text-slate-800 text-base">2026年 8月</span>
-                            <button id="btnNextMonth" class="p-1 hover:bg-slate-100 rounded text-slate-600 transition"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">月間サマリー</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 block">当月 総労働時間</span>
-                            <span id="monthTotalHours" class="text-2xl font-bold text-slate-800 mt-1 block">0<span class="text-sm font-normal text-slate-500">h</span></span>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="text-xs text-slate-500 block">当月 差分合計</span>
-                            <span id="monthDiffHours" class="text-2xl font-bold text-indigo-600 mt-1 block">+0<span class="text-sm font-normal text-slate-500">h</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>勤務日数: <strong id="monthWorkDaysCount" class="text-slate-800">0</strong> 日</span>
-                    <span>1日平均: <strong id="monthAvgHours" class="text-slate-800">0.0</strong> 時間</span>
-                </div>
+            <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+                <span>登録日数: <strong id="totalCount" class="text-slate-700">0</strong> 日</span>
+                <span>今月の累計: <strong id="monthTotal" class="text-slate-700">0時間00分</strong></span>
             </div>
+        </section>
 
-            <!-- 3. 30-Minute Delta Quick Action Box -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+        <!-- Input Form -->
+        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+            <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                <span>📝</span> 記録を入力
+            </h2>
+
+            <form id="recordForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
                 <div>
-                    <div class="flex items-center justify-between text-slate-500 text-sm font-medium mb-2">
-                        <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                            <i class="fa-solid fa-bolt text-amber-500"></i>
-                            当日の時間調整（30分単位）
-                        </span>
-                        <span class="text-[11px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full border border-indigo-100">クイック登録</span>
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">日付</label>
+                    <input type="date" id="inputDate" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">超過・不足の調整（30分単位）</label>
                     
-                    <!-- Date Selector -->
-                    <div class="bg-slate-50 p-2 rounded-lg mt-1 mb-3 border border-slate-100 flex items-center space-x-2">
-                        <i class="fa-regular fa-calendar text-slate-400 pl-1"></i>
-                        <input type="date" id="quickDateInput" class="w-full bg-transparent border-none text-xs sm:text-sm text-slate-700 font-bold focus:outline-none focus:ring-0 p-0" title="記録する日付を選択">
+                    <!-- Quick Preset Buttons -->
+                    <div class="grid grid-cols-4 gap-1.5 mb-2.5">
+                        <button type="button" onclick="setDiffMinutes(60)" class="preset-btn bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 py-2 rounded-lg text-xs font-semibold transition">+1時間</button>
+                        <button type="button" onclick="setDiffMinutes(30)" class="preset-btn bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 py-2 rounded-lg text-xs font-semibold transition">+30分</button>
+                        <button type="button" onclick="setDiffMinutes(0)" class="preset-btn bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 py-2 rounded-lg text-xs font-semibold transition">プラマイ0</button>
+                        <button type="button" onclick="setDiffMinutes(-30)" class="preset-btn bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 py-2 rounded-lg text-xs font-semibold transition">-30分</button>
                     </div>
 
-                    <!-- 30-Minute Stepper Display -->
-                    <div class="bg-indigo-50/70 border border-indigo-100/80 rounded-xl p-3 mb-3 text-center">
-                        <div class="text-xs text-indigo-700 font-medium mb-1">所定7時間に対する超過/不足</div>
-                        
-                        <div class="flex items-center justify-center space-x-3 my-1">
-                            <button type="button" id="btnQuickMinus" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-lg flex items-center justify-center shadow-sm active:scale-95 transition" title="30分減らす">
-                                <i class="fa-solid fa-minus"></i>
-                            </button>
-                            
-                            <div class="min-w-[120px]">
-                                <span id="quickDeltaDisplay" class="text-2xl font-black text-indigo-900 tracking-tight">+0.0h</span>
-                                <div id="quickTotalHoursDisplay" class="text-[11px] font-semibold text-indigo-600">実労働: 7.0時間</div>
-                            </div>
-
-                            <button type="button" id="btnQuickPlus" class="w-9 h-9 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-lg flex items-center justify-center shadow-sm active:scale-95 transition" title="30分増やす">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                        </div>
+                    <!-- Custom Selector -->
+                    <div class="flex items-center gap-2">
+                        <select id="diffSelect" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="180">+3.0時間 (+180分)</option>
+                            <option value="150">+2.5時間 (+150分)</option>
+                            <option value="120">+2.0時間 (+120分)</option>
+                            <option value="90">+1.5時間 (+90分)</option>
+                            <option value="60">+1.0時間 (+60分)</option>
+                            <option value="30">+0.5時間 (+30分)</option>
+                            <option value="0" selected>±0分（7時間きっちり）</option>
+                            <option value="-30">-0.5時間 (-30分)</option>
+                            <option value="-60">-1.0時間 (-60分)</option>
+                            <option value="-90">-1.5時間 (-90分)</option>
+                            <option value="-120">-2.0時間 (-120分)</option>
+                            <option value="-150">-2.5時間 (-150分)</option>
+                            <option value="-180">-3.0時間 (-180分)</option>
+                        </select>
                     </div>
+                </div>
 
-                    <!-- Quick Delta Preset Chips -->
-                    <div class="flex flex-wrap gap-1.5 justify-center mb-3">
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="2.0">+2.0h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="1.5">+1.5h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="1.0">+1.0h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="0.5">+0.5h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="0">±0h(定時)</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="-0.5">-0.5h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="-1.0">-1.0h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700 font-medium transition" data-delta="-2.0">-2.0h</button>
-                        <button type="button" class="quickChip text-xs px-2.5 py-1 rounded-lg border bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800 font-medium transition" data-delta="-7.0">全休(-7h)</button>
-                    </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">メモ（任意）</label>
+                    <input type="text" id="inputMemo" placeholder="例: 早出、プロジェクト残業" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
 
-                    <!-- Quick Submit Button -->
-                    <button id="btnQuickSubmit" type="button" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md shadow-indigo-100 flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>この時間でワンタップ記録</span>
+                <button type="submit" class="w-full bg-indigo-600 active:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition">
+                    記録を保存する
+                </button>
+            </form>
+        </section>
+
+        <!-- Log List -->
+        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                    <span>📅</span> 記録一覧
+                </h2>
+                <span class="text-xs text-slate-400">新しい順</span>
+            </div>
+
+            <div id="logList" class="space-y-2.5">
+                <!-- Log Items generated here -->
+            </div>
+        </section>
+
+        <!-- Settings / Backup Modal -->
+        <div id="settingsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-xl space-y-5 animate-slide-up">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        ⚙️ データバックアップと復元
+                    </h3>
+                    <button onclick="toggleSettings()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">✕</button>
+                </div>
+
+                <!-- Export -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">1. バックアップコードを出力</h4>
+                    <p class="text-xs text-slate-500">現在の全記録をコード化してクリップボードにコピーします。機種変更時や保管用にお使いください。</p>
+                    <button onclick="copyBackupCode()" class="w-full bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-sm hover:bg-slate-700 transition flex items-center justify-center gap-1.5">
+                        <span>📋</span> バックアップコードをコピー
                     </button>
                 </div>
 
-                <button id="btnOpenModal" class="w-full mt-3 py-1.5 text-xs text-slate-500 hover:text-indigo-600 font-medium transition flex items-center justify-center space-x-1">
-                    <i class="fa-regular fa-clock"></i>
-                    <span>時刻打刻や詳細な記録はこちら</span>
-                </button>
-            </div>
-        </section>
+                <hr class="border-slate-100">
 
-        <!-- Main Work Log Section -->
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
-                        <i class="fa-solid fa-list-check text-indigo-600"></i>
-                        <span>日別勤務・超過実績一覧</span>
-                    </h2>
-                    <p class="text-xs text-slate-500">選択中の月の実働時間と残額の遷移履歴</p>
+                <!-- Import -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">2. コードからデータを復元</h4>
+                    <p class="text-xs text-slate-500">コピーしておいたバックアップコードを下に貼り付けて復元します。</p>
+                    <textarea id="importCodeInput" rows="3" placeholder="ここにバックアップコードを貼り付けてください" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <button onclick="restoreFromCode()" class="w-full bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-sm hover:bg-amber-700 transition flex items-center justify-center gap-1.5">
+                        <span>🔄</span> データを復元する
+                    </button>
                 </div>
-                <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <input type="text" id="searchInput" placeholder="メモや日付で検索..." class="w-full sm:w-48 text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+
+                <div class="pt-2">
+                    <button onclick="toggleSettings()" class="w-full bg-slate-100 text-slate-600 font-semibold py-2.5 rounded-xl text-sm">
+                        閉じる
+                    </button>
                 </div>
             </div>
-
-            <!-- Table -->
-            <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
-                        <tr>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">日付</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">区分</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">勤務時間</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">実労働時間</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">当日の差分</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">累積残残量</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold">メモ</th>
-                            <th scope="col" class="py-3.5 px-4 font-semibold text-right">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="workLogTableBody" class="divide-y divide-slate-100 font-medium">
-                        <!-- Dynamic Rows loaded via JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="hidden py-12 text-center text-slate-400">
-                <i class="fa-regular fa-calendar-xmark text-4xl mb-3 block"></i>
-                <p class="text-sm">データがありません。「クイック記録」または「詳細を入力」から追加してください。</p>
-            </div>
-        </section>
+        </div>
 
     </main>
 
-    <!-- Add/Edit Entry Modal -->
-    <div id="entryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 px-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform scale-95 transition-transform duration-200" id="entryModalContent">
-            <div class="bg-indigo-600 px-6 py-4 text-white flex justify-between items-center">
-                <h3 id="modalTitle" class="font-bold text-base flex items-center space-x-2">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>勤務実績の入力</span>
-                </h3>
-                <button id="btnCloseModal" class="text-indigo-200 hover:text-white transition text-lg">&times;</button>
-            </div>
-
-            <form id="workForm" class="p-6 space-y-4">
-                <input type="hidden" id="editEntryId">
-
-                <!-- Date selection -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">日付</label>
-                    <input type="date" id="inputDate" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <!-- Input Type Switch -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">入力方式</label>
-                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-lg">
-                        <button type="button" id="tabDirect" class="py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-indigo-600">時間（何時間）で指定</button>
-                        <button type="button" id="tabClock" class="py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:text-slate-800">時刻（打刻）で計算</button>
-                    </div>
-                </div>
-
-                <!-- Direct Hours Input -->
-                <div id="directHoursSection" class="space-y-3">
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-semibold text-slate-700">実労働時間（時間）</label>
-                            <span class="text-xs text-indigo-600 font-bold" id="calculatedDiffDirect">+0時間</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <input type="number" id="inputHours" step="0.25" min="0" max="24" placeholder="7" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
-                            <span class="text-sm text-slate-500">時間</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-1">※ 1日標準 <span class="standardHoursInline">7</span> 時間との差分が超過時間として積み立てられます。</p>
-                    </div>
-                </div>
-
-                <!-- Clock Time Input -->
-                <div id="clockTimeSection" class="hidden space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">出勤（始業）</label>
-                            <input type="time" id="inputStartTime" value="09:00" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">退勤（終業）</label>
-                            <input type="time" id="inputEndTime" value="17:00" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">休憩時間（時間）</label>
-                        <input type="number" id="inputBreakHours" step="0.25" min="0" value="1.0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div class="bg-indigo-50 p-2.5 rounded-lg flex justify-between items-center text-xs">
-                        <span class="text-indigo-900 font-medium">計算後の実労働時間: <strong id="clockCalculatedHours" class="text-indigo-700 font-bold">7.0時間</strong></span>
-                        <span id="clockCalculatedDiff" class="font-bold text-indigo-600">0.0h</span>
-                    </div>
-                </div>
-
-                <!-- Memo -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">メモ / 業務内容</label>
-                    <input type="text" id="inputMemo" placeholder="例: プロジェクト対応、早退など" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <!-- Buttons -->
-                <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
-                    <button type="button" id="btnCancelModal" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">キャンセル</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition shadow-md shadow-indigo-100">保存する</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 px-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col overflow-hidden">
-            <div class="bg-slate-800 px-6 py-4 text-white flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-base flex items-center space-x-2">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>設定</span>
-                </h3>
-                <button id="btnCloseSettings" class="text-slate-400 hover:text-white transition text-lg">&times;</button>
-            </div>
-            
-            <div class="p-6 space-y-5 text-sm flex-1">
-                <!-- Standard Hours Setting -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">1日の所定労働時間（時間）</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="number" id="settingStandardHours" step="0.5" min="1" max="12" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
-                        <span class="text-xs text-slate-500">時間</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-1">※ デフォルトは7時間です。</p>
-                </div>
-
-                <!-- Privacy Guarantee Note -->
-                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start space-x-2">
-                    <i class="fa-solid fa-shield-halved text-emerald-600 text-base mt-0.5 shrink-0"></i>
-                    <div>
-                        <strong class="font-bold block">完全ローカル・通信なしセキュリティ保証</strong>
-                        <span>入力されたデータや設定は外部サーバーへ送信されません。すべてお使いのブラウザ（ローカル）内に安全に保管されます。</span>
-                    </div>
-                </div>
-
-                <!-- Data Management -->
-                <div class="pt-3 border-t border-slate-200">
-                    <label class="block text-xs font-semibold text-slate-700 mb-2">データ管理</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="btnImportTrigger" type="button" class="py-2 px-3 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-file-import"></i>
-                            <span>CSVから復元</span>
-                        </button>
-                        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
-
-                        <button id="btnClearData" type="button" class="py-2 px-3 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-trash-can"></i>
-                            <span>全データ消去</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
-                <button id="btnSaveSettings" class="px-5 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition">設定を保存する</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Confirmation Modal -->
-    <div id="confirmModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200 px-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-200" id="confirmModalContent">
-            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 id="confirmTitle" class="text-base font-bold text-slate-800 mb-2">確認</h3>
-            <p id="confirmMessage" class="text-xs text-slate-500 mb-6">本当に実行しますか？</p>
-            <div class="flex space-x-3 justify-center">
-                <button id="btnConfirmCancel" class="w-1/2 py-2 px-4 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">キャンセル</button>
-                <button id="btnConfirmOk" class="w-1/2 py-2 px-4 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition shadow-md shadow-red-200">削除する</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center space-x-2">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toastMessage">メッセージ</span>
-    </div>
-
     <script>
-        // State Management
-        const STATE_KEY = 'flextime_app_data_v1';
-        const SETTINGS_KEY = 'flextime_app_settings_v1';
+        const STORAGE_KEY = 'flextime_app_data_v1';
 
-        let appData = []; 
-        let settings = {
-            standardHours: 7.0
-        };
-
-        let currentQuickDelta = 0; // Overtime/under-time delta in decimal hours
-        let currentViewDate = new Date(); // Controls active month view
-        let inputMode = 'direct'; // 'direct' or 'clock'
-
-        // DOM elements
-        const cumulativeHoursText = document.getElementById('cumulativeHoursText');
-        const cumulativeMinsText = document.getElementById('cumulativeMinsText');
-        const cumulativeStatusSubtext = document.getElementById('cumulativeStatusSubtext');
-        const carryoverBadge = document.getElementById('carryoverBadge');
-        const standardHoursLabel = document.getElementById('standardHoursLabel');
-        const currentMonthYearLabel = document.getElementById('currentMonthYearLabel');
-        const monthTotalHours = document.getElementById('monthTotalHours');
-        const monthDiffHours = document.getElementById('monthDiffHours');
-        const monthWorkDaysCount = document.getElementById('monthWorkDaysCount');
-        const monthAvgHours = document.getElementById('monthAvgHours');
-        const workLogTableBody = document.getElementById('workLogTableBody');
-        const emptyState = document.getElementById('emptyState');
-        const searchInput = document.getElementById('searchInput');
-        const quickDateInput = document.getElementById('quickDateInput');
-
-        // Modal DOM
-        const entryModal = document.getElementById('entryModal');
-        const entryModalContent = document.getElementById('entryModalContent');
-        const settingsModal = document.getElementById('settingsModal');
-        const workForm = document.getElementById('workForm');
-        const editEntryId = document.getElementById('editEntryId');
-        const inputDate = document.getElementById('inputDate');
-        const inputHours = document.getElementById('inputHours');
-        const inputStartTime = document.getElementById('inputStartTime');
-        const inputEndTime = document.getElementById('inputEndTime');
-        const inputBreakHours = document.getElementById('inputBreakHours');
-        const inputMemo = document.getElementById('inputMemo');
-        const tabDirect = document.getElementById('tabDirect');
-        const tabClock = document.getElementById('tabClock');
-        const directHoursSection = document.getElementById('directHoursSection');
-        const clockTimeSection = document.getElementById('clockTimeSection');
-        const calculatedDiffDirect = document.getElementById('calculatedDiffDirect');
-        const clockCalculatedHours = document.getElementById('clockCalculatedHours');
-        const clockCalculatedDiff = document.getElementById('clockCalculatedDiff');
-
-        function getTodayString() {
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadSettings();
-            loadData();
-
-            // Set today as default date
-            const todayStr = getTodayString();
-            inputDate.value = todayStr;
-            if (quickDateInput) quickDateInput.value = todayStr;
-
-            setupEventListeners();
-            renderAll();
+        // Initial Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inputDate').value = today;
+            
+            renderApp();
         });
 
-        function loadSettings() {
-            const saved = localStorage.getItem(SETTINGS_KEY);
-            if (saved) {
-                try {
-                    settings = Object.assign(settings, JSON.parse(saved));
-                } catch(e) { console.error(e); }
+        // Get stored data
+        function getData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return { records: [] };
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return { records: [] };
             }
-            updateSettingsUI();
         }
 
-        function saveSettings() {
-            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-            updateSettingsUI();
-            renderAll();
-            showToast('設定を保存しました');
+        // Save data
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            renderApp();
         }
 
-        function updateSettingsUI() {
-            standardHoursLabel.textContent = settings.standardHours.toFixed(1);
-            document.querySelectorAll('.standardHoursInline').forEach(el => el.textContent = settings.standardHours);
-            document.getElementById('settingStandardHours').value = settings.standardHours;
+        // Preset Diff Buttons
+        function setDiffMinutes(mins) {
+            document.getElementById('diffSelect').value = mins;
         }
 
-        function loadData() {
-            const saved = localStorage.getItem(STATE_KEY);
-            if (saved) {
-                try {
-                    appData = JSON.parse(saved);
-                } catch(e) {
-                    appData = [];
-                }
+        // Form Submit
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const date = document.getElementById('inputDate').value;
+            const diffMinutes = parseInt(document.getElementById('diffSelect').value, 10);
+            const memo = document.getElementById('inputMemo').value.trim();
+
+            if (!date) return;
+
+            const data = getData();
+            // Check if record exists for this date -> update or insert
+            const existingIndex = data.records.findIndex(r => r.date === date);
+
+            const newRecord = {
+                id: existingIndex >= 0 ? data.records[existingIndex].id : Date.now().toString(),
+                date: date,
+                diffMinutes: diffMinutes,
+                memo: memo
+            };
+
+            if (existingIndex >= 0) {
+                data.records[existingIndex] = newRecord;
             } else {
-                generateDefaultSampleData();
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem(STATE_KEY, JSON.stringify(appData));
-            renderAll();
-        }
-
-        function generateDefaultSampleData() {
-            const year = currentViewDate.getFullYear();
-            const month = String(currentViewDate.getMonth() + 1).padStart(2, '0');
-
-            appData = [
-                {
-                    id: 'sample-1',
-                    date: `${year}-${month}-01`,
-                    hours: 9.0,
-                    mode: 'direct',
-                    memo: 'プロジェクト開発打合せ（残業2h）'
-                },
-                {
-                    id: 'sample-2',
-                    date: `${year}-${month}-03`,
-                    hours: 6.0,
-                    mode: 'direct',
-                    memo: '通院のため早退（1h消化）'
-                }
-            ];
-            saveData();
-        }
-
-        function getSortedData() {
-            return [...appData].sort((a, b) => new Date(a.date) - new Date(b.date));
-        }
-
-        function calculateMetrics() {
-            const sorted = getSortedData();
-            let runningTotalDiff = 0; // Cumulative carryover hours
-
-            const enriched = sorted.map(entry => {
-                const diff = (entry.hours || 0) - settings.standardHours;
-                runningTotalDiff += diff;
-                return {
-                    ...entry,
-                    diff,
-                    cumulativeBalance: runningTotalDiff
-                };
-            });
-
-            return enriched;
-        }
-
-        function formatHoursAndMins(decimalHours) {
-            const isNegative = decimalHours < 0;
-            const absHours = Math.abs(decimalHours);
-            const h = Math.floor(absHours);
-            const m = Math.round((absHours - h) * 60);
-
-            const sign = isNegative ? '-' : '+';
-            return { sign, h, m, raw: decimalHours };
-        }
-
-        function renderAll() {
-            const enrichedData = calculateMetrics();
-
-            // 1. Overall Cumulative Balance KPI
-            const lastEntry = enrichedData[enrichedData.length - 1];
-            const totalCumulative = lastEntry ? lastEntry.cumulativeBalance : 0;
-            const formattedCum = formatHoursAndMins(totalCumulative);
-
-            if (totalCumulative >= 0) {
-                cumulativeHoursText.textContent = `${formattedCum.sign}${formattedCum.h}`;
-                cumulativeHoursText.className = "text-4xl sm:text-5xl font-black tracking-tight text-emerald-400";
-                cumulativeMinsText.textContent = `${formattedCum.m}分`;
-                cumulativeStatusSubtext.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i>フレックス貯金（超過分）が手元にあります`;
-                carryoverBadge.textContent = "プラス蓄積中";
-                carryoverBadge.className = "font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50";
-            } else {
-                cumulativeHoursText.textContent = `${formattedCum.sign}${formattedCum.h}`;
-                cumulativeHoursText.className = "text-4xl sm:text-5xl font-black tracking-tight text-amber-400";
-                cumulativeMinsText.textContent = `${formattedCum.m}分`;
-                cumulativeStatusSubtext.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1.5"></i>標準労働時間より不足しています（精算対象）`;
-                carryoverBadge.textContent = "マイナス不足中";
-                carryoverBadge.className = "font-semibold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/50";
+                data.records.push(newRecord);
             }
 
-            // 2. Monthly Summary
-            const targetYear = currentViewDate.getFullYear();
-            const targetMonth = currentViewDate.getMonth();
-            currentMonthYearLabel.textContent = `${targetYear}年 ${targetMonth + 1}月`;
+            // Sort by date descending
+            data.records.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            const monthData = enrichedData.filter(d => {
-                const dt = new Date(d.date);
-                return dt.getFullYear() === targetYear && dt.getMonth() === targetMonth;
-            });
+            saveData(data);
 
-            const mTotal = monthData.reduce((acc, curr) => acc + (curr.hours || 0), 0);
-            const mDiff = monthData.reduce((acc, curr) => acc + curr.diff, 0);
-            const workDays = monthData.filter(d => d.hours > 0).length;
-            const avgHours = workDays > 0 ? (mTotal / workDays).toFixed(1) : '0.0';
+            // Reset Memo
+            document.getElementById('inputMemo').value = '';
+            alert('記録を保存しました');
+        }
 
-            monthTotalHours.innerHTML = `${mTotal.toFixed(1)}<span class="text-sm font-normal text-slate-500">h</span>`;
+        // Delete Record
+        function deleteRecord(id) {
+            if (!confirm('この記録を削除しますか？')) return;
+            const data = getData();
+            data.records = data.records.filter(r => r.id !== id);
+            saveData(data);
+        }
+
+        // Format Minutes to String (e.g. +1時間30分, -0時間30分)
+        function formatMinutes(totalMins) {
+            const isNegative = totalMins < 0;
+            const absMins = Math.abs(totalMins);
+            const hours = Math.floor(absMins / 60);
+            const mins = absMins % 60;
+
+            const sign = isNegative ? '-' : (totalMins > 0 ? '+' : '');
+            if (hours === 0 && mins === 0) return '±0分';
             
-            const formattedMDiff = formatHoursAndMins(mDiff);
-            const diffColorClass = mDiff >= 0 ? 'text-indigo-600' : 'text-amber-600';
-            monthDiffHours.className = `text-2xl font-bold ${diffColorClass} mt-1 block`;
-            monthDiffHours.innerHTML = `${formattedMDiff.sign}${formattedMDiff.h}h ${formattedMDiff.m}m`;
-
-            monthWorkDaysCount.textContent = workDays;
-            monthAvgHours.textContent = avgHours;
-
-            // 3. Quick Delta Display
-            updateQuickDeltaDisplay();
-
-            // 4. Render Table
-            renderTable(monthData);
+            let res = sign;
+            if (hours > 0) res += `${hours}時間`;
+            if (mins > 0) res += `${mins}分`;
+            return res;
         }
 
-        function updateQuickDeltaDisplay() {
-            const deltaDisplay = document.getElementById('quickDeltaDisplay');
-            const totalDisplay = document.getElementById('quickTotalHoursDisplay');
-            if (!deltaDisplay || !totalDisplay) return;
+        // Main Render Function
+        function renderApp() {
+            const data = getData();
+            const records = data.records || [];
 
-            const std = settings.standardHours || 7.0;
-            const totalHours = Math.max(0, std + currentQuickDelta);
+            // Calculate Totals
+            let totalDiff = 0;
+            const currentMonthStr = new Date().toISOString().substring(0, 7); // YYYY-MM
+            let monthDiff = 0;
 
-            const fmt = formatHoursAndMins(currentQuickDelta);
-            if (currentQuickDelta > 0) {
-                deltaDisplay.textContent = `${fmt.sign}${fmt.h}h ${fmt.m > 0 ? fmt.m + 'm' : ''}`;
-                deltaDisplay.className = "text-2xl font-black text-indigo-700 tracking-tight";
-            } else if (currentQuickDelta < 0) {
-                deltaDisplay.textContent = `${fmt.sign}${fmt.h}h ${fmt.m > 0 ? fmt.m + 'm' : ''}`;
-                deltaDisplay.className = "text-2xl font-black text-amber-600 tracking-tight";
-            } else {
-                deltaDisplay.textContent = "±0時間";
-                deltaDisplay.className = "text-2xl font-black text-slate-700 tracking-tight";
-            }
-
-            totalDisplay.textContent = `実労働時間: ${totalHours.toFixed(1)}時間`;
-
-            // Highlight active chip if matching
-            document.querySelectorAll('.quickChip').forEach(chip => {
-                const val = parseFloat(chip.dataset.delta);
-                if (Math.abs(val - currentQuickDelta) < 0.01) {
-                    chip.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-100', 'font-bold', 'text-indigo-900');
-                } else {
-                    chip.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-100', 'font-bold', 'text-indigo-900');
+            records.forEach(r => {
+                totalDiff += r.diffMinutes;
+                if (r.date && r.date.startsWith(currentMonthStr)) {
+                    monthDiff += r.diffMinutes;
                 }
             });
-        }
 
-        function renderTable(monthData) {
-            workLogTableBody.innerHTML = '';
-            const query = searchInput.value.toLowerCase().trim();
+            // Render Header Status
+            const totalBadge = document.getElementById('totalBadge');
+            const statusLabel = document.getElementById('statusLabel');
 
-            const filtered = monthData.filter(item => {
-                if (!query) return true;
-                return item.date.includes(query) || (item.memo && item.memo.toLowerCase().includes(query));
-            });
-
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
+            totalBadge.textContent = formatMinutes(totalDiff);
+            
+            if (totalDiff > 0) {
+                totalBadge.className = "text-3xl font-extrabold tracking-tight text-emerald-600";
+                statusLabel.textContent = "超過中";
+                statusLabel.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700";
+            } else if (totalDiff < 0) {
+                totalBadge.className = "text-3xl font-extrabold tracking-tight text-rose-600";
+                statusLabel.textContent = "不足中";
+                statusLabel.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700";
             } else {
-                emptyState.classList.add('hidden');
+                totalBadge.className = "text-3xl font-extrabold tracking-tight text-slate-800";
+                statusLabel.textContent = "±0";
+                statusLabel.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600";
             }
 
-            // Render rows in reverse chronological
-            [...filtered].reverse().forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition-colors";
+            document.getElementById('totalCount').textContent = records.length;
+            document.getElementById('monthTotal').textContent = formatMinutes(monthDiff);
 
-                const dateObj = new Date(item.date);
-                const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][dateObj.getDay()];
-                const dayClass = dateObj.getDay() === 0 ? 'text-red-500 font-bold' : (dateObj.getDay() === 6 ? 'text-blue-500 font-bold' : 'text-slate-700');
+            // Render Log List
+            const logListEl = document.getElementById('logList');
+            logListEl.innerHTML = '';
 
-                const diffFormatted = formatHoursAndMins(item.diff);
-                const diffBadgeClass = item.diff > 0 
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                    : (item.diff < 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200');
-
-                const cumFormatted = formatHoursAndMins(item.cumulativeBalance);
-                const cumColorClass = item.cumulativeBalance >= 0 ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold';
-
-                tr.innerHTML = `
-                    <td class="py-3 px-4 whitespace-nowrap">
-                        <span class="text-slate-900 font-semibold">${item.date}</span>
-                        <span class="text-xs ${dayClass} ml-1">(${dayOfWeek})</span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap text-xs">
-                        ${item.hours === 0 
-                            ? '<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">お休み</span>' 
-                            : '<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">出勤</span>'}
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap text-xs text-slate-500">
-                        ${item.mode === 'clock' && item.startTime ? `${item.startTime} - ${item.endTime} (休${item.breakHours || 1}h)` : '直接指定'}
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                        <span class="text-slate-800 font-bold">${item.hours.toFixed(1)}</span>
-                        <span class="text-xs text-slate-400">時間</span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${diffBadgeClass}">
-                            ${diffFormatted.sign}${diffFormatted.h}h ${diffFormatted.m}m
-                        </span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                        <span class="${cumColorClass} text-xs">
-                            ${cumFormatted.sign}${cumFormatted.h}時間${cumFormatted.m}分
-                        </span>
-                    </td>
-                    <td class="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
-                        ${item.memo || '-'}
-                    </td>
-                    <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
-                        <button onclick="editEntry('${item.id}')" class="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 transition" title="編集">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button onclick="deleteEntry('${item.id}')" class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition" title="削除">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
+            if (records.length === 0) {
+                logListEl.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 text-xs">
+                        まだ記録はありません。<br>上のフォームから登録してください。
+                    </div>
                 `;
-                workLogTableBody.appendChild(tr);
-            });
-        }
-
-        function setupEventListeners() {
-            // Month navigation
-            document.getElementById('btnPrevMonth').addEventListener('click', () => {
-                currentViewDate.setMonth(currentViewDate.getMonth() - 1);
-                renderAll();
-            });
-
-            document.getElementById('btnNextMonth').addEventListener('click', () => {
-                currentViewDate.setMonth(currentViewDate.getMonth() + 1);
-                renderAll();
-            });
-
-            // Modal Controls
-            document.getElementById('btnOpenModal').addEventListener('click', () => {
-                openEntryModal();
-            });
-
-            document.getElementById('btnCloseModal').addEventListener('click', closeEntryModal);
-            document.getElementById('btnCancelModal').addEventListener('click', closeEntryModal);
-
-            // Tab Switching (Direct Hours vs Clock Time)
-            tabDirect.addEventListener('click', () => {
-                inputMode = 'direct';
-                tabDirect.className = "py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-indigo-600";
-                tabClock.className = "py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:text-slate-800";
-                directHoursSection.classList.remove('hidden');
-                clockTimeSection.classList.add('hidden');
-            });
-
-            tabClock.addEventListener('click', () => {
-                inputMode = 'clock';
-                tabClock.className = "py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-indigo-600";
-                tabDirect.className = "py-1.5 text-xs font-semibold rounded-md text-slate-500 hover:text-slate-800";
-                clockTimeSection.classList.remove('hidden');
-                directHoursSection.classList.add('hidden');
-                recalculateClockMode();
-            });
-
-            // Live calculations inside form
-            inputHours.addEventListener('input', () => {
-                const h = parseFloat(inputHours.value) || 0;
-                const diff = h - settings.standardHours;
-                const fmt = formatHoursAndMins(diff);
-                calculatedDiffDirect.textContent = `${fmt.sign}${fmt.h}h ${fmt.m}m (差分)`;
-                calculatedDiffDirect.className = `text-xs font-bold ${diff >= 0 ? 'text-indigo-600' : 'text-amber-600'}`;
-            });
-
-            inputStartTime.addEventListener('change', recalculateClockMode);
-            inputEndTime.addEventListener('change', recalculateClockMode);
-            inputBreakHours.addEventListener('input', recalculateClockMode);
-
-            // Form Submit
-            workForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                let finalHours = 0;
-                if (inputMode === 'direct') {
-                    finalHours = parseFloat(inputHours.value) || 0;
-                } else {
-                    finalHours = calculateHoursFromClock(inputStartTime.value, inputEndTime.value, parseFloat(inputBreakHours.value) || 0);
-                }
-
-                const entry = {
-                    id: editEntryId.value || 'entry-' + Date.now(),
-                    date: inputDate.value,
-                    hours: finalHours,
-                    mode: inputMode,
-                    startTime: inputStartTime.value,
-                    endTime: inputEndTime.value,
-                    breakHours: parseFloat(inputBreakHours.value) || 1.0,
-                    memo: inputMemo.value
-                };
-
-                addOrUpdateEntry(entry);
-                closeEntryModal();
-                showToast('勤務実績を保存しました');
-            });
-
-            // Settings Modal
-            document.getElementById('btnSettings').addEventListener('click', () => {
-                settingsModal.classList.remove('hidden');
-                setTimeout(() => settingsModal.classList.remove('opacity-0'), 10);
-            });
-
-            document.getElementById('btnCloseSettings').addEventListener('click', closeSettingsModal);
-
-            document.getElementById('btnSaveSettings').addEventListener('click', () => {
-                const val = parseFloat(document.getElementById('settingStandardHours').value);
-                if (val && val > 0) {
-                    settings.standardHours = val;
-                }
-                saveSettings();
-                closeSettingsModal();
-            });
-
-            // Data Export/Import & Clear
-            document.getElementById('btnExport').addEventListener('click', exportToCSV);
-            document.getElementById('btnImportTrigger').addEventListener('click', () => {
-                document.getElementById('csvFileInput').click();
-            });
-            document.getElementById('csvFileInput').addEventListener('change', importFromCSV);
-
-            document.getElementById('btnClearData').addEventListener('click', () => {
-                showConfirm('全データ消去', 'すべての登録データをクリアしてもよろしいですか？この操作は取り消せません。', () => {
-                    appData = [];
-                    saveData();
-                    closeSettingsModal();
-                    showToast('データを全削除しました');
-                });
-            });
-
-            // Confirm modal buttons
-            document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirmModal);
-            document.getElementById('btnConfirmOk').addEventListener('click', () => {
-                if (confirmAction) confirmAction();
-                closeConfirmModal();
-            });
-
-            // Search filter
-            searchInput.addEventListener('input', renderAll);
-
-            // Quick Delta Stepper & Chip Handlers
-            document.getElementById('btnQuickMinus').addEventListener('click', () => {
-                currentQuickDelta -= 0.5;
-                if (settings.standardHours + currentQuickDelta < 0) {
-                    currentQuickDelta = -settings.standardHours;
-                }
-                updateQuickDeltaDisplay();
-            });
-
-            document.getElementById('btnQuickPlus').addEventListener('click', () => {
-                currentQuickDelta += 0.5;
-                updateQuickDeltaDisplay();
-            });
-
-            document.querySelectorAll('.quickChip').forEach(chip => {
-                chip.addEventListener('click', (e) => {
-                    currentQuickDelta = parseFloat(e.currentTarget.dataset.delta);
-                    updateQuickDeltaDisplay();
-                });
-            });
-
-            document.getElementById('btnQuickSubmit').addEventListener('click', () => {
-                const targetDateStr = quickDateInput.value || getTodayString();
-                const finalHours = Math.max(0, settings.standardHours + currentQuickDelta);
-
-                let defaultMemo = '';
-                if (currentQuickDelta > 0) defaultMemo = `残業 +${currentQuickDelta}時間`;
-                else if (currentQuickDelta < 0) {
-                    if (finalHours === 0) defaultMemo = '全休';
-                    else defaultMemo = `時間短縮 ${currentQuickDelta}時間`;
-                } else defaultMemo = '定時勤務';
-
-                addOrUpdateEntry({
-                    id: 'entry-' + Date.now(),
-                    date: targetDateStr,
-                    hours: finalHours,
-                    mode: 'direct',
-                    memo: defaultMemo
-                });
-
-                const fmt = formatHoursAndMins(currentQuickDelta);
-                showToast(`${targetDateStr} に 実労働 ${finalHours.toFixed(1)}h (${fmt.sign}${fmt.h}h${fmt.m ? fmt.m+'m' : ''}) を記録しました`);
-            });
-        }
-
-        function recalculateClockMode() {
-            const calculated = calculateHoursFromClock(inputStartTime.value, inputEndTime.value, parseFloat(inputBreakHours.value) || 0);
-            clockCalculatedHours.textContent = `${calculated.toFixed(1)}時間`;
-
-            const diff = calculated - settings.standardHours;
-            const fmt = formatHoursAndMins(diff);
-            clockCalculatedDiff.textContent = `${fmt.sign}${fmt.h}h ${fmt.m}m`;
-            clockCalculatedDiff.className = `font-bold ${diff >= 0 ? 'text-indigo-600' : 'text-amber-600'}`;
-        }
-
-        function calculateHoursFromClock(startStr, endStr, breakH) {
-            if (!startStr || !endStr) return 0;
-            const [sH, sM] = startStr.split(':').map(Number);
-            const [eH, eM] = endStr.split(':').map(Number);
-
-            let startMins = sH * 60 + sM;
-            let endMins = eH * 60 + eM;
-
-            if (endMins < startMins) {
-                endMins += 24 * 60; // Overnight shift support
-            }
-
-            const totalMins = endMins - startMins;
-            const netMins = totalMins - (breakH * 60);
-
-            return Math.max(0, netMins / 60);
-        }
-
-        function addOrUpdateEntry(entry) {
-            const index = appData.findIndex(item => item.id === entry.id);
-            if (index >= 0) {
-                appData[index] = entry;
-            } else {
-                const sameDateIndex = appData.findIndex(item => item.date === entry.date);
-                if (sameDateIndex >= 0) {
-                    appData[sameDateIndex] = entry;
-                } else {
-                    appData.push(entry);
-                }
-            }
-            saveData();
-        }
-
-        function editEntry(id) {
-            const item = appData.find(d => d.id === id);
-            if (!item) return;
-
-            editEntryId.value = item.id;
-            inputDate.value = item.date;
-            inputHours.value = item.hours;
-            inputStartTime.value = item.startTime || '09:00';
-            inputEndTime.value = item.endTime || '17:00';
-            inputBreakHours.value = item.breakHours || 1.0;
-            inputMemo.value = item.memo || '';
-
-            if (item.mode === 'clock') {
-                tabClock.click();
-            } else {
-                tabDirect.click();
-            }
-
-            openEntryModal('勤務実績の編集');
-        }
-
-        function deleteEntry(id) {
-            showConfirm('記録の削除', 'この記録を削除してもよろしいですか？', () => {
-                appData = appData.filter(item => item.id !== id);
-                saveData();
-                showToast('記録を削除しました');
-            });
-        }
-
-        function openEntryModal(title = '勤務実績の入力') {
-            if (!editEntryId.value && quickDateInput) {
-                inputDate.value = quickDateInput.value;
-            }
-
-            document.getElementById('modalTitle').querySelector('span').textContent = title;
-            entryModal.classList.remove('hidden');
-            setTimeout(() => {
-                entryModal.classList.remove('opacity-0');
-                entryModalContent.classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeEntryModal() {
-            entryModalContent.classList.add('scale-95');
-            entryModal.classList.add('opacity-0');
-            setTimeout(() => {
-                entryModal.classList.add('hidden');
-                editEntryId.value = '';
-                workForm.reset();
-                inputDate.value = quickDateInput ? quickDateInput.value : getTodayString();
-            }, 200);
-        }
-
-        function closeSettingsModal() {
-            settingsModal.classList.add('opacity-0');
-            setTimeout(() => {
-                settingsModal.classList.add('hidden');
-            }, 200);
-        }
-
-        function exportToCSV() {
-            if (appData.length === 0) {
-                showToast('エクスポートするデータがありません');
                 return;
             }
 
-            const headers = ['日付', '実労働時間', '始業', '終業', '休憩', 'メモ'];
-            const rows = appData.map(item => [
-                item.date,
-                item.hours,
-                item.startTime || '',
-                item.endTime || '',
-                item.breakHours || '',
-                `"${(item.memo || '').replace(/"/g, '""')}"`
-            ]);
+            records.forEach(r => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100";
 
-            const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `FlexTime_Data_${getTodayString()}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('CSVファイルを保存しました');
+                let diffClass = "text-slate-600 bg-slate-200/60";
+                if (r.diffMinutes > 0) diffClass = "text-emerald-700 bg-emerald-100/80 font-bold";
+                if (r.diffMinutes < 0) diffClass = "text-rose-700 bg-rose-100/80 font-bold";
+
+                item.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="text-sm font-semibold text-slate-800">${r.date}</div>
+                        ${r.memo ? `<div class="text-xs text-slate-500">${escapeHtml(r.memo)}</div>` : ''}
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 rounded-lg text-xs ${diffClass}">
+                            ${formatMinutes(r.diffMinutes)}
+                        </span>
+                        <button onclick="deleteRecord('${r.id}')" class="text-slate-300 hover:text-rose-500 text-sm p-1 transition">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+                logListEl.appendChild(item);
+            });
         }
 
-        function importFromCSV(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Toggle Modal
+        function toggleSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.toggle('hidden');
+        }
 
-            const reader = new FileReader();
-            reader.onload = function(evt) {
+        // Copy Backup Code
+        function copyBackupCode() {
+            const data = getData();
+            if (!data.records || data.records.length === 0) {
+                alert('バックアップするデータがまだありません。');
+                return;
+            }
+            try {
+                const jsonStr = JSON.stringify(data);
+                // Convert to Base64 (UTF-8 safe)
+                const code = btoa(encodeURIComponent(jsonStr));
+                
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('バックアップコードをクリップボードにコピーしました！\nメモ帳などに貼り付けて大切に保管してください。');
+                }).catch(() => {
+                    // Fallback
+                    prompt('以下のバックアップコードをすべて選択してコピーしてください:', code);
+                });
+            } catch (e) {
+                alert('コード生成に失敗しました: ' + e.message);
+            }
+        }
+
+        // Restore from Code
+        function restoreFromCode() {
+            const codeInput = document.getElementById('importCodeInput').value.trim();
+            if (!codeInput) {
+                alert('バックアップコードを入力してください。');
+                return;
+            }
+
+            if (!confirm('データを復元すると、現在入力されているデータは上書きされます。よろしいですか？')) {
+                return;
+            }
+
+            try {
+                let jsonStr = '';
                 try {
-                    const text = evt.target.result;
-                    const lines = text.split(/\r\n|\n/);
-                    const newEntries = [];
-
-                    for (let i = 1; i < lines.length; i++) {
-                        if (!lines[i].trim()) continue;
-                        const cols = lines[i].split(',');
-                        if (cols.length >= 2) {
-                            const date = cols[0].trim();
-                            const hours = parseFloat(cols[1]) || 0;
-                            const memo = cols[5] ? cols[5].replace(/^"|"$/g, '').trim() : '';
-
-                            if (date) {
-                                newEntries.push({
-                                    id: 'entry-' + Date.now() + '-' + i,
-                                    date: date,
-                                    hours: hours,
-                                    mode: 'direct',
-                                    memo: memo
-                                });
-                            }
-                        }
-                    }
-
-                    if (newEntries.length > 0) {
-                        appData = newEntries;
-                        saveData();
-                        closeSettingsModal();
-                        showToast(`${newEntries.length}件のデータをインポートしました`);
-                    } else {
-                        showToast('有効なデータが見つかりませんでした');
-                    }
-                } catch(err) {
-                    showToast('CSVの読み込みに失敗しました');
+                    jsonStr = decodeURIComponent(atob(codeInput));
+                } catch (e) {
+                    // Fallback to raw JSON if not base64
+                    jsonStr = codeInput;
                 }
-            };
-            reader.readAsText(file);
+
+                const parsed = JSON.parse(jsonStr);
+                if (!parsed || !Array.isArray(parsed.records)) {
+                    throw new Error('無効なデータ構造です。');
+                }
+
+                saveData(parsed);
+                document.getElementById('importCodeInput').value = '';
+                toggleSettings();
+                alert('データの復元が完了しました！');
+            } catch (e) {
+                alert('復元に失敗しました。正しいバックアップコードか確認してください。');
+            }
         }
 
-        // Custom Confirmation Modal Helper
-        let confirmAction = null;
-
-        function showConfirm(title, message, onOk) {
-            document.getElementById('confirmTitle').textContent = title;
-            document.getElementById('confirmMessage').textContent = message;
-            confirmAction = onOk;
-
-            const confirmModal = document.getElementById('confirmModal');
-            const confirmModalContent = document.getElementById('confirmModalContent');
-            confirmModal.classList.remove('hidden');
-            setTimeout(() => {
-                confirmModal.classList.remove('opacity-0');
-                confirmModalContent.classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeConfirmModal() {
-            const confirmModal = document.getElementById('confirmModal');
-            const confirmModalContent = document.getElementById('confirmModalContent');
-            confirmModalContent.classList.add('scale-95');
-            confirmModal.classList.add('opacity-0');
-            setTimeout(() => {
-                confirmModal.classList.add('hidden');
-                confirmAction = null;
-            }, 200);
-        }
-
-        // Toast notifications
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            toastMessage.textContent = message;
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+        // Helper
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
         }
     </script>
 </body>
