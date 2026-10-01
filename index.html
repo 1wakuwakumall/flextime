@@ -1,416 +1,583 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="フレックス管理">
-    <title>フレックスタイム時間管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>フレックスタイム管理</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        /* Custom print styles for monthly submission */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; font-size: 12pt; }
+            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; shadow: none !important; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #000 !important; padding: 6px 10px !important; text-align: left; }
+            th { background-color: #f2f2f2 !important; }
         }
-        input, textarea {
-            user-select: text;
-        }
+        .print-only { display: none; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+<body class="h-full text-slate-800 flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
 
     <!-- Header -->
-    <header class="bg-indigo-600 text-white pt-10 pb-6 px-4 shadow-md sticky top-0 z-10">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold tracking-wide">フレックス時間管理</h1>
-                <p class="text-xs text-indigo-200 mt-0.5">1日7時間標準（30分単位調整）</p>
+    <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 leading-none">フレックス管理</h1>
+                    <span class="text-xs text-slate-500 font-medium">標準 7時間 / 日</span>
+                </div>
             </div>
-            <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-indigo-500 transition text-indigo-100" title="設定・バックアップ">
-                ⚙️
-            </button>
+            
+            <div class="flex items-center space-x-2">
+                <!-- Settings Cog Button -->
+                <button onclick="openSettingsModal()" class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors" title="設定・バックアップ" aria-label="設定">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-6 space-y-6">
 
-        <!-- Summary Card -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">通算超過 / 不足時間</h2>
-            <div class="flex items-baseline justify-between">
-                <div id="totalBadge" class="text-3xl font-extrabold tracking-tight text-slate-900">
-                    0時間00分
-                </div>
-                <span id="statusLabel" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
-                    ±0
-                </span>
-            </div>
-            <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-                <span>登録日数: <strong id="totalCount" class="text-slate-700">0</strong> 日</span>
-                <span>今月の累計: <strong id="monthTotal" class="text-slate-700">0時間00分</strong></span>
-            </div>
-        </section>
-
-        <!-- Input Form -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-            <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-                <span>📝</span> 記録を入力
+        <!-- Quick Record Input Panel -->
+        <section class="no-print bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+            <h2 class="text-sm font-semibold text-slate-500 tracking-wider uppercase mb-3 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                超過・不足時間の記録
             </h2>
 
             <form id="recordForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">日付</label>
-                    <input type="date" id="inputDate" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <!-- Date & Note Inputs -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">日付</label>
+                        <input type="date" id="inputDate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">メモ (任意)</label>
+                        <input type="text" id="inputNote" placeholder="例: プロジェクト残業, 早退" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-slate-800">
+                    </div>
                 </div>
 
+                <!-- Quick Increment Buttons (30m steps - NO 0m) -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">超過・不足の調整（30分単位）</label>
-                    
-                    <!-- Quick Preset Buttons -->
-                    <div class="grid grid-cols-4 gap-1.5 mb-2.5">
-                        <button type="button" onclick="setDiffMinutes(60)" class="preset-btn bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 py-2 rounded-lg text-xs font-semibold transition">+1時間</button>
-                        <button type="button" onclick="setDiffMinutes(30)" class="preset-btn bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 py-2 rounded-lg text-xs font-semibold transition">+30分</button>
-                        <button type="button" onclick="setDiffMinutes(0)" class="preset-btn bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 py-2 rounded-lg text-xs font-semibold transition">プラマイ0</button>
-                        <button type="button" onclick="setDiffMinutes(-30)" class="preset-btn bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 py-2 rounded-lg text-xs font-semibold transition">-30分</button>
+                    <label class="block text-xs font-medium text-slate-600 mb-1.5">ワンタップ調整（30分単位）</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button" onclick="quickAdd(60)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200 font-semibold text-sm transition-all text-center">
+                            +1時間 (+60分)
+                        </button>
+                        <button type="button" onclick="quickAdd(30)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200 font-semibold text-sm transition-all text-center">
+                            +30分
+                        </button>
+                        <button type="button" onclick="quickAdd(-30)" class="py-2.5 px-3 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200 font-semibold text-sm transition-all text-center">
+                            -30分
+                        </button>
+                        <button type="button" onclick="quickAdd(-60)" class="py-2.5 px-3 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200 font-semibold text-sm transition-all text-center">
+                            -1時間 (-60分)
+                        </button>
                     </div>
+                </div>
 
-                    <!-- Custom Selector -->
-                    <div class="flex items-center gap-2">
-                        <select id="diffSelect" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="180">+3.0時間 (+180分)</option>
-                            <option value="150">+2.5時間 (+150分)</option>
-                            <option value="120">+2.0時間 (+120分)</option>
-                            <option value="90">+1.5時間 (+90分)</option>
-                            <option value="60">+1.0時間 (+60分)</option>
-                            <option value="30">+0.5時間 (+30分)</option>
-                            <option value="0" selected>±0分（7時間きっちり）</option>
-                            <option value="-30">-0.5時間 (-30分)</option>
-                            <option value="-60">-1.0時間 (-60分)</option>
-                            <option value="-90">-1.5時間 (-90分)</option>
-                            <option value="-120">-2.0時間 (-120分)</option>
-                            <option value="-150">-2.5時間 (-150分)</option>
-                            <option value="-180">-3.0時間 (-180分)</option>
+                <!-- Custom Duration Picker (30m increments) -->
+                <div class="pt-2 border-t border-slate-100 flex flex-wrap sm:flex-nowrap items-center gap-3">
+                    <div class="flex-1 flex items-center space-x-2">
+                        <select id="inputSign" class="py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-slate-700">
+                            <option value="1">超過 (+)</option>
+                            <option value="-1">不足 (-)</option>
+                        </select>
+                        <select id="inputMinutes" class="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-medium text-slate-800">
+                            <option value="30">30分</option>
+                            <option value="60">1時間 (60分)</option>
+                            <option value="90">1時間30分 (90分)</option>
+                            <option value="120">2時間 (120分)</option>
+                            <option value="150">2時間30分 (150分)</option>
+                            <option value="180">3時間 (180分)</option>
+                            <option value="210">3時間30分 (210分)</option>
+                            <option value="240">4時間 (240分)</option>
                         </select>
                     </div>
+                    <button type="submit" class="w-full sm:w-auto py-2.5 px-6 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 active:scale-95 transition-all shadow-md shadow-slate-900/10">
+                        追加登録
+                    </button>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">メモ（任意）</label>
-                    <input type="text" id="inputMemo" placeholder="例: 早出、プロジェクト残業" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <button type="submit" class="w-full bg-indigo-600 active:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition">
-                    記録を保存する
-                </button>
             </form>
         </section>
 
-        <!-- Log List -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                    <span>📅</span> 記録一覧
-                </h2>
-                <span class="text-xs text-slate-400">新しい順</span>
+        <!-- Monthly Summary Dashboard & Filters -->
+        <section class="no-print bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center space-x-2">
+                    <label class="text-xs font-semibold text-slate-500 uppercase">表示月:</label>
+                    <input type="month" id="monthPicker" onchange="renderApp()" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-800 focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <!-- Export CSV Button -->
+                    <button onclick="exportCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        CSV出力
+                    </button>
+                    <!-- Print / PDF Button -->
+                    <button onclick="triggerPrint()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-50 text-brand-700 hover:bg-brand-100 text-xs font-semibold transition-colors border border-brand-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        PDF / 印刷
+                    </button>
+                </div>
             </div>
 
-            <div id="logList" class="space-y-2.5">
-                <!-- Log Items generated here -->
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-center">
+                    <span class="block text-xs font-medium text-slate-500">当月差引累計</span>
+                    <span id="statNetTotal" class="text-lg sm:text-2xl font-black text-slate-900 mt-0.5 block">0分</span>
+                </div>
+                <div class="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-100 text-center">
+                    <span class="block text-xs font-medium text-emerald-600">当月超過 (+)</span>
+                    <span id="statExcess" class="text-lg sm:text-2xl font-bold text-emerald-700 mt-0.5 block">+0分</span>
+                </div>
+                <div class="bg-rose-50/60 p-3.5 rounded-xl border border-rose-100 text-center">
+                    <span class="block text-xs font-medium text-rose-600">当月不足 (-)</span>
+                    <span id="statShortage" class="text-lg sm:text-2xl font-bold text-rose-700 mt-0.5 block">-0分</span>
+                </div>
             </div>
         </section>
 
-        <!-- Settings / Backup Modal -->
-        <div id="settingsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-xl space-y-5 animate-slide-up">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        ⚙️ データバックアップと復元
-                    </h3>
-                    <button onclick="toggleSettings()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">✕</button>
-                </div>
+        <!-- Records History List -->
+        <section class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm">記録一覧</h3>
+                <span id="recordCount" class="text-xs text-slate-400 font-medium">0件の記録</span>
+            </div>
 
-                <!-- Export -->
-                <div class="space-y-2">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">1. バックアップコードを出力</h4>
-                    <p class="text-xs text-slate-500">現在の全記録をコード化してクリップボードにコピーします。機種変更時や保管用にお使いください。</p>
-                    <button onclick="copyBackupCode()" class="w-full bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-sm hover:bg-slate-700 transition flex items-center justify-center gap-1.5">
-                        <span>📋</span> バックアップコードをコピー
-                    </button>
-                </div>
+            <div id="recordsList" class="divide-y divide-slate-100">
+                <!-- Records injected via JavaScript -->
+            </div>
 
-                <hr class="border-slate-100">
-
-                <!-- Import -->
-                <div class="space-y-2">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">2. コードからデータを復元</h4>
-                    <p class="text-xs text-slate-500">コピーしておいたバックアップコードを下に貼り付けて復元します。</p>
-                    <textarea id="importCodeInput" rows="3" placeholder="ここにバックアップコードを貼り付けてください" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                    <button onclick="restoreFromCode()" class="w-full bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-sm hover:bg-amber-700 transition flex items-center justify-center gap-1.5">
-                        <span>🔄</span> データを復元する
-                    </button>
+            <div id="emptyState" class="p-8 text-center hidden">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
+                <p class="text-sm font-medium text-slate-500">この月のデータはありません</p>
+            </div>
+        </section>
 
-                <div class="pt-2">
-                    <button onclick="toggleSettings()" class="w-full bg-slate-100 text-slate-600 font-semibold py-2.5 rounded-xl text-sm">
-                        閉じる
-                    </button>
-                </div>
+        <!-- Print / PDF Submission View (Only active on print window) -->
+        <div class="print-only print-container">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h1 style="font-size: 18pt; font-weight: bold; margin-bottom: 5px;">フレックスタイム勤務時間 調整申請書</h1>
+                <p style="font-size: 10pt;">対象年月: <span id="printMonthLabel" style="font-weight: bold;"></span></p>
+            </div>
+
+            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 10pt;">
+                <div>基本標準時間: 1日 7時間</div>
+                <div>出力日: <span id="printTodayDate"></span></div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">日付</th>
+                        <th style="width: 15%;">区分</th>
+                        <th style="width: 25%;">調整時間</th>
+                        <th>備考・理由</th>
+                    </tr>
+                </thead>
+                <tbody id="printTableBody">
+                    <!-- Injected for print -->
+                </tbody>
+            </table>
+
+            <div style="margin-top: 20px; border-top: 2px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
+                <div>月間差引合計: <span id="printNetTotal"></span></div>
+                <div>( 超過計: <span id="printExcess"></span> / 不足計: <span id="printShortage"></span> )</div>
             </div>
         </div>
 
     </main>
 
-    <script>
-        const STORAGE_KEY = 'flextime_app_data_v1';
+    <!-- Settings & Backup Modal -->
+    <div id="settingsModal" class="no-print fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    データ管理・バックアップ
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
 
-        // Initial Setup
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set today's date as default
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('inputDate').value = today;
-            
+            <!-- Backup Section -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700 uppercase">1. データのバックアップ</label>
+                <p class="text-xs text-slate-500">現在の全データを暗号コードとして出力します。機種変更時などにコピーして保存してください。</p>
+                <button onclick="copyBackupCode()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    バックアップコードをコピー
+                </button>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Restore Section -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700 uppercase">2. データの復元</label>
+                <p class="text-xs text-slate-500">保存しておいたバックアップコードを下に貼り付けて「復元」を押してください。</p>
+                <textarea id="restoreInput" rows="3" placeholder="バックアップコードをここに貼り付け" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-mono text-slate-700"></textarea>
+                <button onclick="restoreData()" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white rounded-xl font-semibold text-xs transition-colors shadow-sm">
+                    データを復元する
+                </button>
+            </div>
+
+            <div class="pt-2 text-right">
+                <button onclick="closeSettingsModal()" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="no-print fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xl transition-all duration-200 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <span id="toastMsg">通知メッセージ</span>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'flextime_records_v1';
+        let records = [];
+
+        // Application Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set default date inputs
+            const today = new Date();
+            document.getElementById('inputDate').value = formatDateIso(today);
+            document.getElementById('monthPicker').value = formatDateMonth(today);
+
+            // Load records
+            loadRecords();
             renderApp();
         });
 
-        // Get stored data
-        function getData() {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return { records: [] };
+        // Load data from localStorage
+        function loadRecords() {
             try {
-                return JSON.parse(raw);
+                const stored = localStorage.getItem(STORAGE_KEY);
+                records = stored ? JSON.parse(stored) : [];
             } catch (e) {
-                return { records: [] };
+                records = [];
+                console.error("Failed to load records", e);
             }
         }
 
-        // Save data
-        function saveData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            renderApp();
+        // Save data to localStorage
+        function saveRecords() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            } catch (e) {
+                showToast("保存に失敗しました");
+            }
         }
 
-        // Preset Diff Buttons
-        function setDiffMinutes(mins) {
-            document.getElementById('diffSelect').value = mins;
-        }
-
-        // Form Submit
+        // Form Submit Handler
         function handleFormSubmit(e) {
             e.preventDefault();
             const date = document.getElementById('inputDate').value;
-            const diffMinutes = parseInt(document.getElementById('diffSelect').value, 10);
-            const memo = document.getElementById('inputMemo').value.trim();
+            const note = document.getElementById('inputNote').value.trim();
+            const sign = parseInt(document.getElementById('inputSign').value, 10);
+            const minutesVal = parseInt(document.getElementById('inputMinutes').value, 10);
 
-            if (!date) return;
+            if (!date || isNaN(minutesVal) || minutesVal <= 0) return;
 
-            const data = getData();
-            // Check if record exists for this date -> update or insert
-            const existingIndex = data.records.findIndex(r => r.date === date);
+            const totalMinutes = sign * minutesVal;
+            addRecord(date, totalMinutes, note);
 
-            const newRecord = {
-                id: existingIndex >= 0 ? data.records[existingIndex].id : Date.now().toString(),
-                date: date,
-                diffMinutes: diffMinutes,
-                memo: memo
-            };
+            // Reset inputs
+            document.getElementById('inputNote').value = '';
+        }
 
-            if (existingIndex >= 0) {
-                data.records[existingIndex] = newRecord;
-            } else {
-                data.records.push(newRecord);
+        // Quick Increment Add Handler (+1h, +30m, -30m, -1h)
+        function quickAdd(mins) {
+            const date = document.getElementById('inputDate').value;
+            const note = document.getElementById('inputNote').value.trim();
+
+            if (!date) {
+                showToast("日付を選択してください");
+                return;
             }
 
-            // Sort by date descending
-            data.records.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            saveData(data);
-
-            // Reset Memo
-            document.getElementById('inputMemo').value = '';
-            alert('記録を保存しました');
+            addRecord(date, mins, note);
+            document.getElementById('inputNote').value = '';
         }
 
-        // Delete Record
-        function deleteRecord(id) {
-            if (!confirm('この記録を削除しますか？')) return;
-            const data = getData();
-            data.records = data.records.filter(r => r.id !== id);
-            saveData(data);
-        }
+        // Add Record Logic
+        function addRecord(date, minutes, note) {
+            const record = {
+                id: Date.now().toString(),
+                date: date,
+                minutes: minutes,
+                note: note,
+                createdAt: new Date().toISOString()
+            };
 
-        // Format Minutes to String (e.g. +1時間30分, -0時間30分)
-        function formatMinutes(totalMins) {
-            const isNegative = totalMins < 0;
-            const absMins = Math.abs(totalMins);
-            const hours = Math.floor(absMins / 60);
-            const mins = absMins % 60;
+            records.push(record);
+            // Sort records descending by date
+            records.sort((a, b) => b.date.localeCompare(a.date));
 
-            const sign = isNegative ? '-' : (totalMins > 0 ? '+' : '');
-            if (hours === 0 && mins === 0) return '±0分';
+            saveRecords();
             
-            let res = sign;
-            if (hours > 0) res += `${hours}時間`;
-            if (mins > 0) res += `${mins}分`;
-            return res;
+            // Auto switch month filter to added date's month
+            if (date.substring(0, 7) !== document.getElementById('monthPicker').value) {
+                document.getElementById('monthPicker').value = date.substring(0, 7);
+            }
+
+            renderApp();
+            showToast("記録を追加しました");
+        }
+
+        // Delete Record Logic
+        function deleteRecord(id) {
+            records = records.filter(r => r.id !== id);
+            saveRecords();
+            renderApp();
+            showToast("削除しました");
         }
 
         // Main Render Function
         function renderApp() {
-            const data = getData();
-            const records = data.records || [];
+            const selectedMonth = document.getElementById('monthPicker').value;
+            const filtered = records.filter(r => r.date.startsWith(selectedMonth));
 
-            // Calculate Totals
-            let totalDiff = 0;
-            const currentMonthStr = new Date().toISOString().substring(0, 7); // YYYY-MM
-            let monthDiff = 0;
+            const listEl = document.getElementById('recordsList');
+            const emptyEl = document.getElementById('emptyState');
+            listEl.innerHTML = '';
 
-            records.forEach(r => {
-                totalDiff += r.diffMinutes;
-                if (r.date && r.date.startsWith(currentMonthStr)) {
-                    monthDiff += r.diffMinutes;
-                }
-            });
+            let totalExcess = 0;
+            let totalShortage = 0;
 
-            // Render Header Status
-            const totalBadge = document.getElementById('totalBadge');
-            const statusLabel = document.getElementById('statusLabel');
-
-            totalBadge.textContent = formatMinutes(totalDiff);
-            
-            if (totalDiff > 0) {
-                totalBadge.className = "text-3xl font-extrabold tracking-tight text-emerald-600";
-                statusLabel.textContent = "超過中";
-                statusLabel.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700";
-            } else if (totalDiff < 0) {
-                totalBadge.className = "text-3xl font-extrabold tracking-tight text-rose-600";
-                statusLabel.textContent = "不足中";
-                statusLabel.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700";
+            if (filtered.length === 0) {
+                emptyEl.classList.remove('hidden');
             } else {
-                totalBadge.className = "text-3xl font-extrabold tracking-tight text-slate-800";
-                statusLabel.textContent = "±0";
-                statusLabel.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600";
+                emptyEl.classList.add('hidden');
+
+                filtered.forEach(record => {
+                    if (record.minutes > 0) totalExcess += record.minutes;
+                    if (record.minutes < 0) totalShortage += Math.abs(record.minutes);
+
+                    const isExcess = record.minutes > 0;
+                    const badgeBg = isExcess ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+                    const signStr = isExcess ? '+' : '-';
+
+                    const item = document.createElement('div');
+                    item.className = 'p-4 flex items-center justify-between hover:bg-slate-50/80 transition-colors';
+                    item.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="px-2.5 py-1 rounded-lg border text-xs font-bold ${badgeBg}">
+                                ${signStr}${formatMinutes(Math.abs(record.minutes))}
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-slate-800">${formatJapaneseDate(record.date)}</div>
+                                ${record.note ? `<div class="text-xs text-slate-500 mt-0.5">${escapeHtml(record.note)}</div>` : ''}
+                            </div>
+                        </div>
+                        <button onclick="deleteRecord('${record.id}')" class="p-2 text-slate-400 hover:text-rose-600 transition-colors" title="削除">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    `;
+                    listEl.appendChild(item);
+                });
             }
 
-            document.getElementById('totalCount').textContent = records.length;
-            document.getElementById('monthTotal').textContent = formatMinutes(monthDiff);
+            // Calculate Monthly Net
+            const netMinutes = totalExcess - totalShortage;
+            
+            // Update Dashboard Stats
+            document.getElementById('statNetTotal').innerText = (netMinutes >= 0 ? '+' : '-') + formatMinutes(Math.abs(netMinutes));
+            document.getElementById('statNetTotal').className = `text-lg sm:text-2xl font-black mt-0.5 block ${netMinutes >= 0 ? 'text-emerald-700' : 'text-rose-700'}`;
+            document.getElementById('statExcess').innerText = '+' + formatMinutes(totalExcess);
+            document.getElementById('statShortage').innerText = '-' + formatMinutes(totalShortage);
+            document.getElementById('recordCount').innerText = `${filtered.length}件の記録`;
 
-            // Render Log List
-            const logListEl = document.getElementById('logList');
-            logListEl.innerHTML = '';
+            // Prepare Print View
+            renderPrintView(filtered, selectedMonth, netMinutes, totalExcess, totalShortage);
+        }
 
-            if (records.length === 0) {
-                logListEl.innerHTML = `
-                    <div class="text-center py-8 text-slate-400 text-xs">
-                        まだ記録はありません。<br>上のフォームから登録してください。
-                    </div>
+        // Render Print Table
+        function renderPrintView(filtered, monthStr, netMins, excessMins, shortageMins) {
+            document.getElementById('printMonthLabel').innerText = monthStr.replace('-', '年 ') + '月';
+            document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('ja-JP');
+            
+            const tbody = document.getElementById('printTableBody');
+            tbody.innerHTML = '';
+
+            filtered.forEach(r => {
+                const tr = document.createElement('tr');
+                const isExcess = r.minutes > 0;
+                tr.innerHTML = `
+                    <td>${r.date}</td>
+                    <td>${isExcess ? '超過' : '不足'}</td>
+                    <td>${isExcess ? '+' : '-'}${formatMinutes(Math.abs(r.minutes))}</td>
+                    <td>${escapeHtml(r.note || '-')}</td>
                 `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('printNetTotal').innerText = (netMins >= 0 ? '+' : '-') + formatMinutes(Math.abs(netMins));
+            document.getElementById('printExcess').innerText = '+' + formatMinutes(excessMins);
+            document.getElementById('printShortage').innerText = '-' + formatMinutes(shortageMins);
+        }
+
+        // CSV Export Function (UTF-8 with BOM for Excel compatibility)
+        function exportCSV() {
+            const selectedMonth = document.getElementById('monthPicker').value;
+            const filtered = records.filter(r => r.date.startsWith(selectedMonth));
+
+            if (filtered.length === 0) {
+                showToast("出力するデータがありません");
                 return;
             }
 
-            records.forEach(r => {
-                const item = document.createElement('div');
-                item.className = "flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100";
-
-                let diffClass = "text-slate-600 bg-slate-200/60";
-                if (r.diffMinutes > 0) diffClass = "text-emerald-700 bg-emerald-100/80 font-bold";
-                if (r.diffMinutes < 0) diffClass = "text-rose-700 bg-rose-100/80 font-bold";
-
-                item.innerHTML = `
-                    <div class="space-y-0.5">
-                        <div class="text-sm font-semibold text-slate-800">${r.date}</div>
-                        ${r.memo ? `<div class="text-xs text-slate-500">${escapeHtml(r.memo)}</div>` : ''}
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="px-2.5 py-1 rounded-lg text-xs ${diffClass}">
-                            ${formatMinutes(r.diffMinutes)}
-                        </span>
-                        <button onclick="deleteRecord('${r.id}')" class="text-slate-300 hover:text-rose-500 text-sm p-1 transition">
-                            🗑️
-                        </button>
-                    </div>
-                `;
-                logListEl.appendChild(item);
+            let csvContent = "\uFEFF日付,区分,調整時間(分),調整時間(表記),備考\n";
+            filtered.forEach(r => {
+                const type = r.minutes > 0 ? "超過" : "不足";
+                const formatted = (r.minutes > 0 ? "+" : "-") + formatMinutes(Math.abs(r.minutes));
+                const note = (r.note || "").replace(/"/g, '""');
+                csvContent += `"${r.date}","${type}","${r.minutes}","${formatted}","${note}"\n`;
             });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `flextime_report_${selectedMonth}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        // Toggle Modal
-        function toggleSettings() {
-            const modal = document.getElementById('settingsModal');
-            modal.classList.toggle('hidden');
+        // Trigger Print Window
+        function triggerPrint() {
+            window.print();
+        }
+
+        // Backup and Restore Modals Logic
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
         }
 
         // Copy Backup Code
         function copyBackupCode() {
-            const data = getData();
-            if (!data.records || data.records.length === 0) {
-                alert('バックアップするデータがまだありません。');
+            if (records.length === 0) {
+                showToast("保存されているデータがありません");
                 return;
             }
             try {
-                const jsonStr = JSON.stringify(data);
-                // Convert to Base64 (UTF-8 safe)
-                const code = btoa(encodeURIComponent(jsonStr));
+                const code = btoa(encodeURIComponent(JSON.stringify(records)));
                 
-                navigator.clipboard.writeText(code).then(() => {
-                    alert('バックアップコードをクリップボードにコピーしました！\nメモ帳などに貼り付けて大切に保管してください。');
-                }).catch(() => {
-                    // Fallback
-                    prompt('以下のバックアップコードをすべて選択してコピーしてください:', code);
-                });
+                // Fallback copy implementation
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = code;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                showToast("バックアップコードをコピーしました！");
             } catch (e) {
-                alert('コード生成に失敗しました: ' + e.message);
+                showToast("コードの生成に失敗しました");
             }
         }
 
-        // Restore from Code
-        function restoreFromCode() {
-            const codeInput = document.getElementById('importCodeInput').value.trim();
-            if (!codeInput) {
-                alert('バックアップコードを入力してください。');
-                return;
-            }
-
-            if (!confirm('データを復元すると、現在入力されているデータは上書きされます。よろしいですか？')) {
+        // Restore Data Logic
+        function restoreData() {
+            const input = document.getElementById('restoreInput').value.trim();
+            if (!input) {
+                showToast("コードを貼り付けてください");
                 return;
             }
 
             try {
-                let jsonStr = '';
-                try {
-                    jsonStr = decodeURIComponent(atob(codeInput));
-                } catch (e) {
-                    // Fallback to raw JSON if not base64
-                    jsonStr = codeInput;
-                }
+                const decodedJson = decodeURIComponent(atob(input));
+                const parsedRecords = JSON.parse(decodedJson);
 
-                const parsed = JSON.parse(jsonStr);
-                if (!parsed || !Array.isArray(parsed.records)) {
-                    throw new Error('無効なデータ構造です。');
+                if (Array.isArray(parsedRecords)) {
+                    records = parsedRecords;
+                    saveRecords();
+                    renderApp();
+                    closeSettingsModal();
+                    document.getElementById('restoreInput').value = '';
+                    showToast("データを正常に復元しました！");
+                } else {
+                    throw new Error("Invalid format");
                 }
-
-                saveData(parsed);
-                document.getElementById('importCodeInput').value = '';
-                toggleSettings();
-                alert('データの復元が完了しました！');
             } catch (e) {
-                alert('復元に失敗しました。正しいバックアップコードか確認してください。');
+                showToast("無効なバックアップコードです");
             }
         }
 
-        // Helper
+        // Utility Helper Functions
+        function formatMinutes(mins) {
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            if (h === 0) return `${m}分`;
+            if (m === 0) return `${h}時間`;
+            return `${h}時間${m}分`;
+        }
+
+        function formatDateIso(d) {
+            return d.toISOString().split('T')[0];
+        }
+
+        function formatDateMonth(d) {
+            return d.toISOString().substring(0, 7);
+        }
+
+        function formatJapaneseDate(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length < 3) return dateStr;
+            return `${parts[0]}年${parseInt(parts[1], 10)}月${parseInt(parts[2], 10)}日`;
+        }
+
         function escapeHtml(str) {
-            return str.replace(/[&<>"']/g, function(m) {
-                return {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                }[m];
-            });
+            return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
         }
     </script>
 </body>
