@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" class="h-full bg-slate-50">
+<html lang="ja" class="h-full bg-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -23,38 +23,38 @@
             }
         }
     </script>
+    <!-- Custom CSS for Printable PDF Layout -->
     <style>
-        /* Custom print styles for monthly submission */
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            body { background: white !important; color: black !important; font-size: 12pt; }
-            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; shadow: none !important; }
+            body { background: white !important; color: black !important; font-size: 11pt; }
+            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
             table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            th, td { border: 1px solid #000 !important; padding: 6px 10px !important; text-align: left; }
-            th { background-color: #f2f2f2 !important; }
+            th, td { border: 1px solid #333 !important; padding: 6px 10px !important; text-align: left; }
+            th { background-color: #f3f4f6 !important; }
         }
         .print-only { display: none; }
     </style>
 </head>
 <body class="h-full text-slate-800 flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- Header -->
-    <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <!-- Application Header -->
+    <header class="no-print bg-slate-900 text-white sticky top-0 z-30 shadow-md">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-500 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg text-slate-900 leading-none">フレックス管理</h1>
-                    <span class="text-xs text-slate-500 font-medium">標準 7時間 / 日</span>
+                    <h1 class="font-bold text-base sm:text-lg leading-none text-white">フレックス時間管理</h1>
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-medium">1日 7時間標準 | iPhone最適化</span>
                 </div>
             </div>
             
             <div class="flex items-center space-x-2">
-                <!-- Settings Cog Button -->
-                <button onclick="openSettingsModal()" class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors" title="設定・バックアップ" aria-label="設定">
+                <!-- Settings Button -->
+                <button onclick="openSettingsModal()" class="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 active:bg-slate-700 transition-colors" title="設定・データ管理" aria-label="設定">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
             </div>
@@ -62,55 +62,146 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-6 space-y-6">
+    <main class="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 py-4 space-y-5">
 
-        <!-- Quick Record Input Panel -->
-        <section class="no-print bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-            <h2 class="text-sm font-semibold text-slate-500 tracking-wider uppercase mb-3 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                超過・不足時間の記録
-            </h2>
+        <!-- Monthly Navigation & Work Filter Bar -->
+        <section class="no-print bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+            <!-- Month Selector -->
+            <div class="flex items-center space-x-1.5">
+                <button onclick="changeMonth(-1)" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 transition-colors" title="前月">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <input type="month" id="monthPicker" onchange="renderApp()" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+                <button onclick="changeMonth(1)" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 transition-colors" title="次月">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+
+            <!-- Job/Work Category Filter -->
+            <div class="flex items-center space-x-2 flex-1 justify-end min-w-[180px]">
+                <label class="text-xs font-semibold text-slate-500 whitespace-nowrap">業務区分:</label>
+                <select id="jobCategoryFilter" onchange="renderApp()" class="w-full sm:w-auto px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+                    <option value="ALL">すべての業務 (全体累計)</option>
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </section>
+
+        <!-- TOP DASHBOARD: Large Highlight Summary KPI Cards -->
+        <section class="no-print space-y-3">
+            <!-- Cumulative Net Difference Card (Hero Card) -->
+            <div id="heroCard" class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-5 shadow-lg border border-slate-700/50 relative overflow-hidden transition-all duration-300">
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                        当月 差引累計 (超過・不足)
+                    </span>
+                    <span id="heroMonthLabel" class="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-full font-medium">2026年10月</span>
+                </div>
+                
+                <div class="mt-3 flex items-baseline justify-between flex-wrap gap-2">
+                    <div id="heroNetValue" class="text-3xl sm:text-4xl font-black tracking-tight text-brand-500">
+                        +0時間00分
+                    </div>
+                    <div id="heroBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-500 border border-brand-500/30">
+                        適正ペース
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+                    <div>1日基本標準: <span class="font-bold text-slate-200">7時間</span></div>
+                    <div>所定平日数: <span id="statWorkingDays" class="font-bold text-slate-200">22日</span></div>
+                </div>
+            </div>
+
+            <!-- Detailed Grid Statistics -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <!-- Total Worked Hours -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <span class="block text-[11px] font-semibold text-slate-500">当月 実労働時間</span>
+                    <span id="statTotalWorked" class="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">0時間00分</span>
+                    <span class="text-[10px] text-slate-400 mt-0.5 block">標準時間 + 調整合計</span>
+                </div>
+
+                <!-- Standard Required Hours -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <span class="block text-[11px] font-semibold text-slate-500">当月 標準必要時間</span>
+                    <span id="statStandardRequired" class="text-xl sm:text-2xl font-bold text-slate-800 mt-1 block">154時間00分</span>
+                    <span class="text-[10px] text-slate-400 mt-0.5 block">(平日日数 × 7時間)</span>
+                </div>
+
+                <!-- Excess vs Shortage Split -->
+                <div class="col-span-2 sm:col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex items-center justify-between sm:flex-col sm:items-start">
+                    <div>
+                        <span class="block text-[11px] font-semibold text-slate-500">内訳 (超過 / 不足)</span>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span id="statExcessOnly" class="text-sm font-bold text-emerald-600">+0分</span>
+                            <span class="text-slate-300">/</span>
+                            <span id="statShortageOnly" class="text-sm font-bold text-rose-600">-0分</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1">当月の個別記録合計</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Daily Record Input Panel -->
+        <section class="no-print bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h2 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    日次超過・不足の記録
+                </h2>
+                <span class="text-xs text-slate-400 font-medium">30分単位で登録</span>
+            </div>
 
             <form id="recordForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <!-- Date & Note Inputs -->
+                <!-- Date & Work Category Inputs -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">日付</label>
-                        <input type="date" id="inputDate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-800">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">日付</label>
+                        <input type="date" id="inputDate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">メモ (任意)</label>
-                        <input type="text" id="inputNote" placeholder="例: プロジェクト残業, 早退" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-slate-800">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">業務種別</label>
+                        <select id="inputJobCategory" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900">
+                            <!-- Populated via JS -->
+                        </select>
                     </div>
                 </div>
 
-                <!-- Quick Increment Buttons (30m steps - NO 0m) -->
+                <!-- Quick Buttons (30m steps - NO 0m option) -->
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1.5">ワンタップ調整（30分単位）</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">ワンタップクイック調整</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <button type="button" onclick="quickAdd(60)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200 font-semibold text-sm transition-all text-center">
+                        <button type="button" onclick="quickAdd(120)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
+                            +2時間 (+120分)
+                        </button>
+                        <button type="button" onclick="quickAdd(60)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
                             +1時間 (+60分)
                         </button>
-                        <button type="button" onclick="quickAdd(30)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200 font-semibold text-sm transition-all text-center">
+                        <button type="button" onclick="quickAdd(30)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
                             +30分
                         </button>
-                        <button type="button" onclick="quickAdd(-30)" class="py-2.5 px-3 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200 font-semibold text-sm transition-all text-center">
+                        <button type="button" onclick="quickAdd(-30)" class="py-2.5 px-3 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200/80 font-bold text-xs transition-all text-center">
                             -30分
-                        </button>
-                        <button type="button" onclick="quickAdd(-60)" class="py-2.5 px-3 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200 font-semibold text-sm transition-all text-center">
-                            -1時間 (-60分)
                         </button>
                     </div>
                 </div>
 
-                <!-- Custom Duration Picker (30m increments) -->
-                <div class="pt-2 border-t border-slate-100 flex flex-wrap sm:flex-nowrap items-center gap-3">
-                    <div class="flex-1 flex items-center space-x-2">
-                        <select id="inputSign" class="py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-slate-700">
+                <!-- Custom Duration Picker Dropdowns (NO プラマイゼロ) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">区分</label>
+                        <select id="inputSign" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-slate-800">
                             <option value="1">超過 (+)</option>
                             <option value="-1">不足 (-)</option>
                         </select>
-                        <select id="inputMinutes" class="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-medium text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">調整時間</label>
+                        <select id="inputMinutes" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-medium text-slate-900">
                             <option value="30">30分</option>
                             <option value="60">1時間 (60分)</option>
                             <option value="90">1時間30分 (90分)</option>
@@ -119,126 +210,133 @@
                             <option value="180">3時間 (180分)</option>
                             <option value="210">3時間30分 (210分)</option>
                             <option value="240">4時間 (240分)</option>
+                            <option value="300">5時間 (300分)</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full sm:w-auto py-2.5 px-6 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 active:scale-95 transition-all shadow-md shadow-slate-900/10">
-                        追加登録
-                    </button>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">メモ (任意)</label>
+                        <input type="text" id="inputNote" placeholder="例: 早退, 残業" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 text-slate-900 text-xs">
+                    </div>
                 </div>
+
+                <button type="submit" class="w-full py-3 px-6 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md shadow-slate-900/10">
+                    記録を追加保存する
+                </button>
             </form>
         </section>
 
-        <!-- Monthly Summary Dashboard & Filters -->
-        <section class="no-print bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div class="flex items-center space-x-2">
-                    <label class="text-xs font-semibold text-slate-500 uppercase">表示月:</label>
-                    <input type="month" id="monthPicker" onchange="renderApp()" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-800 focus:outline-none focus:border-brand-500">
+        <!-- Monthly Records List Section -->
+        <section class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm">記録一覧</h3>
+                    <span id="recordCountLabel" class="text-xs text-slate-400">0件の記録</span>
                 </div>
 
+                <!-- Export Action Buttons -->
                 <div class="flex items-center space-x-2">
-                    <!-- Export CSV Button -->
-                    <button onclick="exportCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <button onclick="exportCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-bold transition-colors">
+                        <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         CSV出力
                     </button>
-                    <!-- Print / PDF Button -->
-                    <button onclick="triggerPrint()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-50 text-brand-700 hover:bg-brand-100 text-xs font-semibold transition-colors border border-brand-200">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <button onclick="triggerPrint()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200 text-xs font-bold transition-colors border border-brand-200">
+                        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         PDF / 印刷
                     </button>
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-3 gap-3">
-                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-center">
-                    <span class="block text-xs font-medium text-slate-500">当月差引累計</span>
-                    <span id="statNetTotal" class="text-lg sm:text-2xl font-black text-slate-900 mt-0.5 block">0分</span>
-                </div>
-                <div class="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-100 text-center">
-                    <span class="block text-xs font-medium text-emerald-600">当月超過 (+)</span>
-                    <span id="statExcess" class="text-lg sm:text-2xl font-bold text-emerald-700 mt-0.5 block">+0分</span>
-                </div>
-                <div class="bg-rose-50/60 p-3.5 rounded-xl border border-rose-100 text-center">
-                    <span class="block text-xs font-medium text-rose-600">当月不足 (-)</span>
-                    <span id="statShortage" class="text-lg sm:text-2xl font-bold text-rose-700 mt-0.5 block">-0分</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Records History List -->
-        <section class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 class="font-bold text-slate-800 text-sm">記録一覧</h3>
-                <span id="recordCount" class="text-xs text-slate-400 font-medium">0件の記録</span>
-            </div>
-
+            <!-- List container -->
             <div id="recordsList" class="divide-y divide-slate-100">
-                <!-- Records injected via JavaScript -->
+                <!-- Dynamically filled via JavaScript -->
             </div>
 
+            <!-- Empty State -->
             <div id="emptyState" class="p-8 text-center hidden">
                 <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
-                <p class="text-sm font-medium text-slate-500">この月のデータはありません</p>
+                <p class="text-xs font-medium text-slate-500">この月（または選択中業務）の記録はありません</p>
             </div>
         </section>
 
-        <!-- Print / PDF Submission View (Only active on print window) -->
+        <!-- Print / PDF Submission View (Only active on print preview) -->
         <div class="print-only print-container">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h1 style="font-size: 18pt; font-weight: bold; margin-bottom: 5px;">フレックスタイム勤務時間 調整申請書</h1>
-                <p style="font-size: 10pt;">対象年月: <span id="printMonthLabel" style="font-weight: bold;"></span></p>
+                <h1 style="font-size: 18pt; font-weight: bold; margin-bottom: 5px;">フレックスタイム調整 勤務実績報告書</h1>
+                <p style="font-size: 11pt; color: #444;">対象年月: <span id="printMonthLabel" style="font-weight: bold; color: #000;"></span></p>
             </div>
 
             <div style="margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 10pt;">
                 <div>基本標準時間: 1日 7時間</div>
-                <div>出力日: <span id="printTodayDate"></span></div>
+                <div>対象業務: <span id="printJobFilterLabel">すべて</span></div>
+                <div>発行日: <span id="printTodayDate"></span></div>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 20%;">日付</th>
+                        <th style="width: 18%;">日付</th>
+                        <th style="width: 22%;">業務種別</th>
                         <th style="width: 15%;">区分</th>
-                        <th style="width: 25%;">調整時間</th>
-                        <th>備考・理由</th>
+                        <th style="width: 20%;">調整時間</th>
+                        <th>備考・事由</th>
                     </tr>
                 </thead>
                 <tbody id="printTableBody">
-                    <!-- Injected for print -->
+                    <!-- Populated for print view -->
                 </tbody>
             </table>
 
-            <div style="margin-top: 20px; border-top: 2px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
-                <div>月間差引合計: <span id="printNetTotal"></span></div>
-                <div>( 超過計: <span id="printExcess"></span> / 不足計: <span id="printShortage"></span> )</div>
+            <div style="margin-top: 25px; border-top: 2px solid #000; padding-top: 12px; font-size: 11pt;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <div>標準必要時間計: <span id="printStandardRequired"></span></div>
+                    <div>実労働時間計: <span id="printTotalWorked" style="font-weight: bold;"></span></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12pt; background-color: #f9fafb; padding: 8px; border: 1px solid #ccc;">
+                    <div>当月 差引累計時間 (超過/不足):</div>
+                    <div id="printNetTotal" style="font-size: 13pt;"></div>
+                </div>
             </div>
         </div>
 
     </main>
 
     <!-- Settings & Backup Modal -->
-    <div id="settingsModal" class="no-print fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in duration-150">
+    <div id="settingsModal" class="no-print fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    データ管理・バックアップ
+                <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                    設定・データ移行
                 </h3>
                 <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <!-- Backup Section -->
+            <!-- Job Category Management Section -->
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase">1. データのバックアップ</label>
-                <p class="text-xs text-slate-500">現在の全データを暗号コードとして出力します。機種変更時などにコピーして保存してください。</p>
-                <button onclick="copyBackupCode()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                <label class="block text-xs font-bold text-slate-800 uppercase">業務種別の追加・管理</label>
+                <div class="flex gap-2">
+                    <input type="text" id="newCategoryInput" placeholder="例: A社業務, プロジェクトB" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-brand-500">
+                    <button onclick="addJobCategory()" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800">
+                        追加
+                    </button>
+                </div>
+                <div id="categoryChips" class="flex flex-wrap gap-1.5 pt-1">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Backup Code Copy Section -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-800 uppercase">1. データのバックアップ (機種変更時)</label>
+                <p class="text-xs text-slate-500">全記録を暗号コード化してコピーします。メモ帳やLINE等に保管してください。</p>
+                <button onclick="copyBackupCode()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors">
+                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     バックアップコードをコピー
                 </button>
             </div>
@@ -247,16 +345,16 @@
 
             <!-- Restore Section -->
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase">2. データの復元</label>
-                <p class="text-xs text-slate-500">保存しておいたバックアップコードを下に貼り付けて「復元」を押してください。</p>
+                <label class="block text-xs font-bold text-slate-800 uppercase">2. データの復元</label>
+                <p class="text-xs text-slate-500">コピーしておいたバックアップコードを下に貼り付けて復元します。</p>
                 <textarea id="restoreInput" rows="3" placeholder="バックアップコードをここに貼り付け" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-mono text-slate-700"></textarea>
-                <button onclick="restoreData()" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white rounded-xl font-semibold text-xs transition-colors shadow-sm">
+                <button onclick="restoreData()" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs transition-colors shadow-sm">
                     データを復元する
                 </button>
             </div>
 
             <div class="pt-2 text-right">
-                <button onclick="closeSettingsModal()" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">
+                <button onclick="closeSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">
                     閉じる
                 </button>
             </div>
@@ -269,25 +367,120 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'flextime_records_v1';
-        let records = [];
+        const STORAGE_RECORDS_KEY = 'flextime_records_v2';
+        const STORAGE_CATEGORIES_KEY = 'flextime_categories_v2';
 
-        // Application Initialization
+        let records = [];
+        let jobCategories = ['メイン業務', 'サブ業務'];
+
+        // App Initialization
         window.addEventListener('DOMContentLoaded', () => {
-            // Set default date inputs
             const today = new Date();
             document.getElementById('inputDate').value = formatDateIso(today);
             document.getElementById('monthPicker').value = formatDateMonth(today);
 
-            // Load records
+            loadCategories();
             loadRecords();
+            renderCategorySelects();
             renderApp();
         });
 
-        // Load data from localStorage
+        // Load Categories from localStorage
+        function loadCategories() {
+            try {
+                const stored = localStorage.getItem(STORAGE_CATEGORIES_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        jobCategories = parsed;
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load categories", e);
+            }
+        }
+
+        // Save Categories
+        function saveCategories() {
+            try {
+                localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(jobCategories));
+            } catch (e) {
+                console.error("Failed to save categories", e);
+            }
+        }
+
+        // Render Dropdown options for Categories
+        function renderCategorySelects() {
+            const filterSelect = document.getElementById('jobCategoryFilter');
+            const inputSelect = document.getElementById('inputJobCategory');
+            const currentFilterVal = filterSelect.value || 'ALL';
+            const currentInputVal = inputSelect.value;
+
+            // Filter select
+            filterSelect.innerHTML = '<option value="ALL">すべての業務 (全体累計)</option>';
+            jobCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                filterSelect.appendChild(opt);
+            });
+            filterSelect.value = currentFilterVal;
+
+            // Input select
+            inputSelect.innerHTML = '';
+            jobCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                inputSelect.appendChild(opt);
+            });
+            if (currentInputVal && jobCategories.includes(currentInputVal)) {
+                inputSelect.value = currentInputVal;
+            }
+
+            // Chips in Settings
+            const chipsContainer = document.getElementById('categoryChips');
+            chipsContainer.innerHTML = '';
+            jobCategories.forEach(cat => {
+                const chip = document.createElement('span');
+                chip.className = 'inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg';
+                chip.innerHTML = `
+                    ${escapeHtml(cat)}
+                    ${jobCategories.length > 1 ? `<button onclick="removeJobCategory('${escapeHtml(cat)}')" class="text-slate-400 hover:text-rose-600 ml-1">×</button>` : ''}
+                `;
+                chipsContainer.appendChild(chip);
+            });
+        }
+
+        function addJobCategory() {
+            const val = document.getElementById('newCategoryInput').value.trim();
+            if (!val) return;
+            if (!jobCategories.includes(val)) {
+                jobCategories.push(val);
+                saveCategories();
+                renderCategorySelects();
+                renderApp();
+                showToast(`「${val}」を追加しました`);
+            }
+            document.getElementById('newCategoryInput').value = '';
+        }
+
+        function removeJobCategory(cat) {
+            if (jobCategories.length <= 1) {
+                showToast("最低1つの業務種別が必要です");
+                return;
+            }
+            jobCategories = jobCategories.filter(c => c !== cat);
+            saveCategories();
+            renderCategorySelects();
+            renderApp();
+            showToast("削除しました");
+        }
+
+        // Load Records from LocalStorage
         function loadRecords() {
             try {
-                const stored = localStorage.getItem(STORAGE_KEY);
+                const stored = localStorage.getItem(STORAGE_RECORDS_KEY);
                 records = stored ? JSON.parse(stored) : [];
             } catch (e) {
                 records = [];
@@ -295,35 +488,46 @@
             }
         }
 
-        // Save data to localStorage
         function saveRecords() {
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+                localStorage.setItem(STORAGE_RECORDS_KEY, JSON.stringify(records));
             } catch (e) {
-                showToast("保存に失敗しました");
+                showToast("データの保存に失敗しました");
             }
+        }
+
+        // Month Navigation Handler
+        function changeMonth(offset) {
+            const picker = document.getElementById('monthPicker');
+            const current = picker.value;
+            if (!current) return;
+
+            const [year, month] = current.split('-').map(Number);
+            const date = new Date(year, month - 1 + offset, 1);
+            picker.value = formatDateMonth(date);
+            renderApp();
         }
 
         // Form Submit Handler
         function handleFormSubmit(e) {
             e.preventDefault();
             const date = document.getElementById('inputDate').value;
-            const note = document.getElementById('inputNote').value.trim();
+            const category = document.getElementById('inputJobCategory').value;
             const sign = parseInt(document.getElementById('inputSign').value, 10);
             const minutesVal = parseInt(document.getElementById('inputMinutes').value, 10);
+            const note = document.getElementById('inputNote').value.trim();
 
             if (!date || isNaN(minutesVal) || minutesVal <= 0) return;
 
             const totalMinutes = sign * minutesVal;
-            addRecord(date, totalMinutes, note);
+            addRecord(date, category, totalMinutes, note);
 
-            // Reset inputs
             document.getElementById('inputNote').value = '';
         }
 
-        // Quick Increment Add Handler (+1h, +30m, -30m, -1h)
         function quickAdd(mins) {
             const date = document.getElementById('inputDate').value;
+            const category = document.getElementById('inputJobCategory').value;
             const note = document.getElementById('inputNote').value.trim();
 
             if (!date) {
@@ -331,36 +535,35 @@
                 return;
             }
 
-            addRecord(date, mins, note);
+            addRecord(date, category, mins, note);
             document.getElementById('inputNote').value = '';
         }
 
-        // Add Record Logic
-        function addRecord(date, minutes, note) {
+        function addRecord(date, category, minutes, note) {
             const record = {
                 id: Date.now().toString(),
                 date: date,
+                category: category || jobCategories[0],
                 minutes: minutes,
                 note: note,
                 createdAt: new Date().toISOString()
             };
 
             records.push(record);
-            // Sort records descending by date
             records.sort((a, b) => b.date.localeCompare(a.date));
 
             saveRecords();
-            
-            // Auto switch month filter to added date's month
-            if (date.substring(0, 7) !== document.getElementById('monthPicker').value) {
-                document.getElementById('monthPicker').value = date.substring(0, 7);
+
+            // Auto shift month filter if needed
+            const recordMonth = date.substring(0, 7);
+            if (recordMonth !== document.getElementById('monthPicker').value) {
+                document.getElementById('monthPicker').value = recordMonth;
             }
 
             renderApp();
-            showToast("記録を追加しました");
+            showToast("差引時間を追加登録しました");
         }
 
-        // Delete Record Logic
         function deleteRecord(id) {
             records = records.filter(r => r.id !== id);
             saveRecords();
@@ -368,125 +571,200 @@
             showToast("削除しました");
         }
 
+        // Calculate weekdays in month (Monday - Friday)
+        function getWorkingDaysInMonth(year, monthIndex) {
+            const date = new Date(year, monthIndex, 1);
+            let count = 0;
+            while (date.getMonth() === monthIndex) {
+                const day = date.getDay();
+                if (day !== 0 && day !== 6) { // Not Sunday or Saturday
+                    count++;
+                }
+                date.setDate(date.getDate() + 1);
+            }
+            return count;
+        }
+
         // Main Render Function
         function renderApp() {
             const selectedMonth = document.getElementById('monthPicker').value;
-            const filtered = records.filter(r => r.date.startsWith(selectedMonth));
+            const selectedCategory = document.getElementById('jobCategoryFilter').value;
 
-            const listEl = document.getElementById('recordsList');
-            const emptyEl = document.getElementById('emptyState');
-            listEl.innerHTML = '';
+            // Filter records
+            const monthFiltered = records.filter(r => r.date.startsWith(selectedMonth));
+            const filtered = monthFiltered.filter(r => {
+                return selectedCategory === 'ALL' || r.category === selectedCategory;
+            });
 
-            let totalExcess = 0;
-            let totalShortage = 0;
+            // Calculate Working Days & Standard Hours (7 hours = 420 mins per day)
+            const [year, monthNum] = selectedMonth.split('-').map(Number);
+            const workingDays = getWorkingDaysInMonth(year, monthNum - 1);
+            const standardRequiredMinutes = workingDays * 7 * 60; // 7h / day
 
-            if (filtered.length === 0) {
-                emptyEl.classList.remove('hidden');
+            // Calculate Totals
+            let totalExcessMinutes = 0;
+            let totalShortageMinutes = 0;
+
+            filtered.forEach(r => {
+                if (r.minutes > 0) totalExcessMinutes += r.minutes;
+                if (r.minutes < 0) totalShortageMinutes += Math.abs(r.minutes);
+            });
+
+            const netAdjustmentMinutes = totalExcessMinutes - totalShortageMinutes;
+            const totalWorkedMinutes = standardRequiredMinutes + netAdjustmentMinutes;
+
+            // Update Hero Card UI
+            const heroNetValue = document.getElementById('heroNetValue');
+            const heroCard = document.getElementById('heroCard');
+            const heroBadge = document.getElementById('heroBadge');
+
+            document.getElementById('heroMonthLabel').innerText = `${year}年${monthNum}月`;
+            document.getElementById('statWorkingDays').innerText = `${workingDays}日`;
+
+            const signSymbol = netAdjustmentMinutes >= 0 ? '+' : '-';
+            const absNetMinutes = Math.abs(netAdjustmentMinutes);
+            heroNetValue.innerText = `${signSymbol}${formatHoursMinutes(absNetMinutes)}`;
+
+            if (netAdjustmentMinutes > 0) {
+                heroNetValue.className = "text-3xl sm:text-4xl font-black tracking-tight text-emerald-400";
+                heroBadge.innerText = "超過 (プラス貯金)";
+                heroBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            } else if (netAdjustmentMinutes < 0) {
+                heroNetValue.className = "text-3xl sm:text-4xl font-black tracking-tight text-rose-400";
+                heroBadge.innerText = "不足 (マイナス注意)";
+                heroBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
             } else {
-                emptyEl.classList.add('hidden');
-
-                filtered.forEach(record => {
-                    if (record.minutes > 0) totalExcess += record.minutes;
-                    if (record.minutes < 0) totalShortage += Math.abs(record.minutes);
-
-                    const isExcess = record.minutes > 0;
-                    const badgeBg = isExcess ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
-                    const signStr = isExcess ? '+' : '-';
-
-                    const item = document.createElement('div');
-                    item.className = 'p-4 flex items-center justify-between hover:bg-slate-50/80 transition-colors';
-                    item.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <div class="px-2.5 py-1 rounded-lg border text-xs font-bold ${badgeBg}">
-                                ${signStr}${formatMinutes(Math.abs(record.minutes))}
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-800">${formatJapaneseDate(record.date)}</div>
-                                ${record.note ? `<div class="text-xs text-slate-500 mt-0.5">${escapeHtml(record.note)}</div>` : ''}
-                            </div>
-                        </div>
-                        <button onclick="deleteRecord('${record.id}')" class="p-2 text-slate-400 hover:text-rose-600 transition-colors" title="削除">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    `;
-                    listEl.appendChild(item);
-                });
+                heroNetValue.className = "text-3xl sm:text-4xl font-black tracking-tight text-brand-400";
+                heroBadge.innerText = "±0分 (標準ジャスト)";
+                heroBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30";
             }
 
-            // Calculate Monthly Net
-            const netMinutes = totalExcess - totalShortage;
-            
-            // Update Dashboard Stats
-            document.getElementById('statNetTotal').innerText = (netMinutes >= 0 ? '+' : '-') + formatMinutes(Math.abs(netMinutes));
-            document.getElementById('statNetTotal').className = `text-lg sm:text-2xl font-black mt-0.5 block ${netMinutes >= 0 ? 'text-emerald-700' : 'text-rose-700'}`;
-            document.getElementById('statExcess').innerText = '+' + formatMinutes(totalExcess);
-            document.getElementById('statShortage').innerText = '-' + formatMinutes(totalShortage);
-            document.getElementById('recordCount').innerText = `${filtered.length}件の記録`;
+            // Update Stats Grid
+            document.getElementById('statTotalWorked').innerText = formatHoursMinutes(totalWorkedMinutes);
+            document.getElementById('statStandardRequired').innerText = formatHoursMinutes(standardRequiredMinutes);
+            document.getElementById('statExcessOnly').innerText = `+${formatHoursMinutes(totalExcessMinutes)}`;
+            document.getElementById('statShortageOnly').innerText = `-${formatHoursMinutes(totalShortageMinutes)}`;
 
-            // Prepare Print View
-            renderPrintView(filtered, selectedMonth, netMinutes, totalExcess, totalShortage);
+            // Render Records List
+            renderRecordsList(filtered);
+
+            // Prepare Print Layout
+            renderPrintView(filtered, selectedMonth, selectedCategory, standardRequiredMinutes, totalWorkedMinutes, netAdjustmentMinutes);
+        }
+
+        // Render List Items
+        function renderRecordsList(filteredList) {
+            const listEl = document.getElementById('recordsList');
+            const emptyEl = document.getElementById('emptyState');
+            const countLabel = document.getElementById('recordCountLabel');
+
+            listEl.innerHTML = '';
+            countLabel.innerText = `${filteredList.length}件の記録`;
+
+            if (filteredList.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            filteredList.forEach(r => {
+                const isExcess = r.minutes > 0;
+                const badgeStyle = isExcess 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' 
+                    : 'bg-rose-50 text-rose-700 border-rose-200/80';
+                const signStr = isExcess ? '+' : '-';
+
+                const item = document.createElement('div');
+                item.className = 'p-3.5 sm:p-4 flex items-center justify-between hover:bg-slate-50 transition-colors';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="px-2.5 py-1 rounded-lg border text-xs font-black ${badgeStyle}">
+                            ${signStr}${formatHoursMinutes(Math.abs(r.minutes))}
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-900">${formatJapaneseDate(r.date)}</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold">${escapeHtml(r.category || '業務')}</span>
+                            </div>
+                            ${r.note ? `<div class="text-xs text-slate-500 mt-0.5">${escapeHtml(r.note)}</div>` : ''}
+                        </div>
+                    </div>
+                    <button onclick="deleteRecord('${r.id}')" class="p-2 text-slate-300 hover:text-rose-600 active:text-rose-700 transition-colors" title="削除">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                listEl.appendChild(item);
+            });
         }
 
         // Render Print Table
-        function renderPrintView(filtered, monthStr, netMins, excessMins, shortageMins) {
+        function renderPrintView(filteredList, monthStr, categoryStr, reqMins, workedMins, netMins) {
             document.getElementById('printMonthLabel').innerText = monthStr.replace('-', '年 ') + '月';
+            document.getElementById('printJobFilterLabel').innerText = categoryStr === 'ALL' ? '全業務' : categoryStr;
             document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('ja-JP');
-            
+
             const tbody = document.getElementById('printTableBody');
             tbody.innerHTML = '';
 
-            filtered.forEach(r => {
+            filteredList.forEach(r => {
                 const tr = document.createElement('tr');
                 const isExcess = r.minutes > 0;
                 tr.innerHTML = `
                     <td>${r.date}</td>
-                    <td>${isExcess ? '超過' : '不足'}</td>
-                    <td>${isExcess ? '+' : '-'}${formatMinutes(Math.abs(r.minutes))}</td>
+                    <td>${escapeHtml(r.category || '-')}</td>
+                    <td>${isExcess ? '超過 (+)' : '不足 (-)'}</td>
+                    <td style="font-weight: bold;">${isExcess ? '+' : '-'}${formatHoursMinutes(Math.abs(r.minutes))}</td>
                     <td>${escapeHtml(r.note || '-')}</td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('printNetTotal').innerText = (netMins >= 0 ? '+' : '-') + formatMinutes(Math.abs(netMins));
-            document.getElementById('printExcess').innerText = '+' + formatMinutes(excessMins);
-            document.getElementById('printShortage').innerText = '-' + formatMinutes(shortageMins);
+            document.getElementById('printStandardRequired').innerText = formatHoursMinutes(reqMins);
+            document.getElementById('printTotalWorked').innerText = formatHoursMinutes(workedMins);
+
+            const signSymbol = netMins >= 0 ? '+' : '-';
+            document.getElementById('printNetTotal').innerText = `${signSymbol}${formatHoursMinutes(Math.abs(netMins))}`;
         }
 
-        // CSV Export Function (UTF-8 with BOM for Excel compatibility)
+        // CSV Export (Excel UTF-8 BOM compatibility)
         function exportCSV() {
             const selectedMonth = document.getElementById('monthPicker').value;
-            const filtered = records.filter(r => r.date.startsWith(selectedMonth));
+            const selectedCategory = document.getElementById('jobCategoryFilter').value;
+
+            const monthFiltered = records.filter(r => r.date.startsWith(selectedMonth));
+            const filtered = monthFiltered.filter(r => selectedCategory === 'ALL' || r.category === selectedCategory);
 
             if (filtered.length === 0) {
-                showToast("出力するデータがありません");
+                showToast("出力する記録がありません");
                 return;
             }
 
-            let csvContent = "\uFEFF日付,区分,調整時間(分),調整時間(表記),備考\n";
+            let csvContent = "\uFEFF日付,業務種別,区分,調整時間(分),調整時間(表記),備考\n";
             filtered.forEach(r => {
                 const type = r.minutes > 0 ? "超過" : "不足";
-                const formatted = (r.minutes > 0 ? "+" : "-") + formatMinutes(Math.abs(r.minutes));
+                const formatted = (r.minutes > 0 ? "+" : "-") + formatHoursMinutes(Math.abs(r.minutes));
                 const note = (r.note || "").replace(/"/g, '""');
-                csvContent += `"${r.date}","${type}","${r.minutes}","${formatted}","${note}"\n`;
+                const cat = (r.category || "基本業務").replace(/"/g, '""');
+                csvContent += `"${r.date}","${cat}","${type}","${r.minutes}","${formatted}","${note}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.setAttribute('href', url);
-            link.setAttribute('download', `flextime_report_${selectedMonth}.csv`);
+            link.setAttribute('download', `flextime_report_${selectedMonth}_${selectedCategory}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        // Trigger Print Window
         function triggerPrint() {
             window.print();
         }
 
-        // Backup and Restore Modals Logic
+        // Settings Modal Handlers
         function openSettingsModal() {
+            renderCategorySelects();
             document.getElementById('settingsModal').classList.remove('hidden');
         }
 
@@ -501,9 +779,9 @@
                 return;
             }
             try {
-                const code = btoa(encodeURIComponent(JSON.stringify(records)));
-                
-                // Fallback copy implementation
+                const dataObj = { records: records, categories: jobCategories };
+                const code = btoa(encodeURIComponent(JSON.stringify(dataObj)));
+
                 const tempTextArea = document.createElement('textarea');
                 tempTextArea.value = code;
                 document.body.appendChild(tempTextArea);
@@ -513,11 +791,11 @@
 
                 showToast("バックアップコードをコピーしました！");
             } catch (e) {
-                showToast("コードの生成に失敗しました");
+                showToast("コード生成に失敗しました");
             }
         }
 
-        // Restore Data Logic
+        // Restore Data
         function restoreData() {
             const input = document.getElementById('restoreInput').value.trim();
             if (!input) {
@@ -527,30 +805,38 @@
 
             try {
                 const decodedJson = decodeURIComponent(atob(input));
-                const parsedRecords = JSON.parse(decodedJson);
+                const parsed = JSON.parse(decodedJson);
 
-                if (Array.isArray(parsedRecords)) {
-                    records = parsedRecords;
-                    saveRecords();
-                    renderApp();
-                    closeSettingsModal();
-                    document.getElementById('restoreInput').value = '';
-                    showToast("データを正常に復元しました！");
+                if (Array.isArray(parsed)) {
+                    records = parsed;
+                } else if (parsed && Array.isArray(parsed.records)) {
+                    records = parsed.records;
+                    if (Array.isArray(parsed.categories)) {
+                        jobCategories = parsed.categories;
+                        saveCategories();
+                    }
                 } else {
-                    throw new Error("Invalid format");
+                    throw new Error("Format error");
                 }
+
+                saveRecords();
+                renderCategorySelects();
+                renderApp();
+                closeSettingsModal();
+                document.getElementById('restoreInput').value = '';
+                showToast("データを正常に復元しました！");
             } catch (e) {
                 showToast("無効なバックアップコードです");
             }
         }
 
-        // Utility Helper Functions
-        function formatMinutes(mins) {
-            const h = Math.floor(mins / 60);
-            const m = mins % 60;
+        // Helper Formatting Functions
+        function formatHoursMinutes(totalMins) {
+            const h = Math.floor(totalMins / 60);
+            const m = totalMins % 60;
             if (h === 0) return `${m}分`;
             if (m === 0) return `${h}時間`;
-            return `${h}時間${m}分`;
+            return `${h}時間${m.toString().padStart(2, '0')}分`;
         }
 
         function formatDateIso(d) {
@@ -568,7 +854,7 @@
         }
 
         function escapeHtml(str) {
-            return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+            return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
         }
 
         function showToast(msg) {
