@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>フレックスタイム管理</title>
+    <title>フレックスタイム超過・不足管理</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,7 +31,7 @@
             body { background: white !important; color: black !important; font-size: 11pt; }
             .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
             table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            th, td { border: 1px solid #333 !important; padding: 6px 10px !important; text-align: left; }
+            th, td { border: 1px solid #333 !important; padding: 8px 10px !important; text-align: left; }
             th { background-color: #f3f4f6 !important; }
         }
         .print-only { display: none; }
@@ -41,14 +41,14 @@
 
     <!-- Application Header -->
     <header class="no-print bg-slate-900 text-white sticky top-0 z-30 shadow-md">
-        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-500 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <h1 class="font-bold text-base sm:text-lg leading-none text-white">フレックス時間管理</h1>
-                    <span class="text-[10px] sm:text-xs text-slate-400 font-medium">1日 7時間標準 | iPhone最適化</span>
+                    <h1 class="font-bold text-base leading-none text-white">フレックス時間管理</h1>
+                    <span class="text-[10px] text-slate-400 font-medium">超過・不足の差分累計アプリ</span>
                 </div>
             </div>
             
@@ -62,10 +62,10 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 py-4 space-y-5">
+    <main class="flex-1 max-w-xl w-full mx-auto px-3 sm:px-4 py-4 space-y-4">
 
         <!-- Monthly Navigation & Work Filter Bar -->
-        <section class="no-print bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+        <section class="no-print bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-2.5">
             <!-- Month Selector -->
             <div class="flex items-center space-x-1.5">
                 <button onclick="changeMonth(-1)" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 transition-colors" title="前月">
@@ -78,82 +78,60 @@
             </div>
 
             <!-- Job/Work Category Filter -->
-            <div class="flex items-center space-x-2 flex-1 justify-end min-w-[180px]">
-                <label class="text-xs font-semibold text-slate-500 whitespace-nowrap">業務区分:</label>
-                <select id="jobCategoryFilter" onchange="renderApp()" class="w-full sm:w-auto px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
-                    <option value="ALL">すべての業務 (全体累計)</option>
+            <div class="flex items-center space-x-1.5 flex-1 justify-end min-w-[150px]">
+                <label class="text-xs font-semibold text-slate-500 whitespace-nowrap">業務:</label>
+                <select id="jobCategoryFilter" onchange="renderApp()" class="w-full sm:w-auto px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20">
+                    <option value="ALL">すべての業務 (全累計)</option>
                     <!-- Options populated by JS -->
                 </select>
             </div>
         </section>
 
-        <!-- TOP DASHBOARD: Large Highlight Summary KPI Cards -->
-        <section class="no-print space-y-3">
-            <!-- Cumulative Net Difference Card (Hero Card) -->
+        <!-- TOP DASHBOARD: Hero Highlight Summary Card (Net Cumulative Time Only) -->
+        <section class="no-print">
             <div id="heroCard" class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-5 shadow-lg border border-slate-700/50 relative overflow-hidden transition-all duration-300">
                 <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
+                
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
-                        当月 差引累計 (超過・不足)
+                        <span id="heroPulseDot" class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                        当月 差引累計時間 (超過・不足)
                     </span>
-                    <span id="heroMonthLabel" class="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-full font-medium">2026年10月</span>
+                    <span id="heroMonthLabel" class="text-xs bg-slate-800/80 border border-slate-700 text-slate-300 px-2.5 py-0.5 rounded-full font-medium">--</span>
                 </div>
                 
-                <div class="mt-3 flex items-baseline justify-between flex-wrap gap-2">
-                    <div id="heroNetValue" class="text-3xl sm:text-4xl font-black tracking-tight text-brand-500">
-                        +0時間00分
+                <!-- Main Value Display -->
+                <div class="mt-4 mb-2 flex items-baseline justify-between flex-wrap gap-2">
+                    <div id="heroNetValue" class="text-4xl sm:text-5xl font-black tracking-tight text-brand-400">
+                        +0分
                     </div>
-                    <div id="heroBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-500 border border-brand-500/30">
-                        適正ペース
+                    <div id="heroBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">
+                        プラマイゼロ
                     </div>
                 </div>
 
+                <!-- Sub Breakdown (Excess vs Shortage Totals) -->
                 <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
-                    <div>1日基本標準: <span class="font-bold text-slate-200">7時間</span></div>
-                    <div>所定平日数: <span id="statWorkingDays" class="font-bold text-slate-200">22日</span></div>
-                </div>
-            </div>
-
-            <!-- Detailed Grid Statistics -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <!-- Total Worked Hours -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-                    <span class="block text-[11px] font-semibold text-slate-500">当月 実労働時間</span>
-                    <span id="statTotalWorked" class="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">0時間00分</span>
-                    <span class="text-[10px] text-slate-400 mt-0.5 block">標準時間 + 調整合計</span>
-                </div>
-
-                <!-- Standard Required Hours -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-                    <span class="block text-[11px] font-semibold text-slate-500">当月 標準必要時間</span>
-                    <span id="statStandardRequired" class="text-xl sm:text-2xl font-bold text-slate-800 mt-1 block">154時間00分</span>
-                    <span class="text-[10px] text-slate-400 mt-0.5 block">(平日日数 × 7時間)</span>
-                </div>
-
-                <!-- Excess vs Shortage Split -->
-                <div class="col-span-2 sm:col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex items-center justify-between sm:flex-col sm:items-start">
-                    <div>
-                        <span class="block text-[11px] font-semibold text-slate-500">内訳 (超過 / 不足)</span>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span id="statExcessOnly" class="text-sm font-bold text-emerald-600">+0分</span>
-                            <span class="text-slate-300">/</span>
-                            <span id="statShortageOnly" class="text-sm font-bold text-rose-600">-0分</span>
-                        </div>
+                    <div class="flex items-center gap-1.5">
+                        <span>当月超過合計:</span>
+                        <span id="statExcessOnly" class="font-bold text-emerald-400">+0分</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 mt-1">当月の個別記録合計</span>
+                    <div class="flex items-center gap-1.5">
+                        <span>当月不足合計:</span>
+                        <span id="statShortageOnly" class="font-bold text-rose-400">-0分</span>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Daily Record Input Panel -->
-        <section class="no-print bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <section class="no-print bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <h2 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    日次超過・不足の記録
+                    日次超過・不足の登録
                 </h2>
-                <span class="text-xs text-slate-400 font-medium">30分単位で登録</span>
+                <span class="text-[11px] text-slate-400 font-medium">30分単位での入力</span>
             </div>
 
             <form id="recordForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -161,47 +139,63 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">日付</label>
-                        <input type="date" id="inputDate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900">
+                        <input type="date" id="inputDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">業務種別</label>
-                        <select id="inputJobCategory" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900">
+                        <select id="inputJobCategory" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900 text-sm">
                             <!-- Populated via JS -->
                         </select>
                     </div>
                 </div>
 
-                <!-- Quick Buttons (30m steps - NO 0m option) -->
+                <!-- Quick Buttons (Positive and Negative 30m steps - NO 0m option) -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-2">ワンタップクイック調整</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <button type="button" onclick="quickAdd(120)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
-                            +2時間 (+120分)
-                        </button>
-                        <button type="button" onclick="quickAdd(60)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
-                            +1時間 (+60分)
-                        </button>
-                        <button type="button" onclick="quickAdd(30)" class="py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">ワンタップクイック登録</label>
+                    <!-- Overtime (+) Quick Buttons -->
+                    <div class="grid grid-cols-4 gap-1.5 mb-1.5">
+                        <button type="button" onclick="quickAdd(30)" class="py-2 px-1 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
                             +30分
                         </button>
-                        <button type="button" onclick="quickAdd(-30)" class="py-2.5 px-3 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200/80 font-bold text-xs transition-all text-center">
+                        <button type="button" onclick="quickAdd(60)" class="py-2 px-1 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
+                            +1時間
+                        </button>
+                        <button type="button" onclick="quickAdd(90)" class="py-2 px-1 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
+                            +1.5時間
+                        </button>
+                        <button type="button" onclick="quickAdd(120)" class="py-2 px-1 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-95 border border-emerald-200/80 font-bold text-xs transition-all text-center">
+                            +2時間
+                        </button>
+                    </div>
+                    <!-- Shortage (-) Quick Buttons -->
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button type="button" onclick="quickAdd(-30)" class="py-2 px-1 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200/80 font-bold text-xs transition-all text-center">
                             -30分
+                        </button>
+                        <button type="button" onclick="quickAdd(-60)" class="py-2 px-1 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200/80 font-bold text-xs transition-all text-center">
+                            -1時間
+                        </button>
+                        <button type="button" onclick="quickAdd(-90)" class="py-2 px-1 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200/80 font-bold text-xs transition-all text-center">
+                            -1.5時間
+                        </button>
+                        <button type="button" onclick="quickAdd(-120)" class="py-2 px-1 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 border border-rose-200/80 font-bold text-xs transition-all text-center">
+                            -2時間
                         </button>
                     </div>
                 </div>
 
-                <!-- Custom Duration Picker Dropdowns (NO プラマイゼロ) -->
+                <!-- Custom Duration Form Dropdowns (NO 0m) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">区分</label>
-                        <select id="inputSign" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-slate-800">
+                        <select id="inputSign" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-slate-800 text-xs">
                             <option value="1">超過 (+)</option>
                             <option value="-1">不足 (-)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">調整時間</label>
-                        <select id="inputMinutes" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-medium text-slate-900">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">時間指定</label>
+                        <select id="inputMinutes" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 font-medium text-slate-900 text-xs">
                             <option value="30">30分</option>
                             <option value="60">1時間 (60分)</option>
                             <option value="90">1時間30分 (90分)</option>
@@ -214,20 +208,20 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">メモ (任意)</label>
-                        <input type="text" id="inputNote" placeholder="例: 早退, 残業" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 text-slate-900 text-xs">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">備考 / メモ</label>
+                        <input type="text" id="inputNote" placeholder="例: 早退, 残業, 調整" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 text-slate-900 text-xs">
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-3 px-6 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md shadow-slate-900/10">
-                    記録を追加保存する
+                <button type="submit" class="w-full py-3 px-6 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md shadow-slate-900/10">
+                    手動入力で記録を追加
                 </button>
             </form>
         </section>
 
         <!-- Monthly Records List Section -->
         <section class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+            <div class="px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
                 <div>
                     <h3 class="font-bold text-slate-900 text-sm">記録一覧</h3>
                     <span id="recordCountLabel" class="text-xs text-slate-400">0件の記録</span>
@@ -236,11 +230,11 @@
                 <!-- Export Action Buttons -->
                 <div class="flex items-center space-x-2">
                     <button onclick="exportCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-bold transition-colors">
-                        <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        CSV出力
+                        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        CSV
                     </button>
                     <button onclick="triggerPrint()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200 text-xs font-bold transition-colors border border-brand-200">
-                        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         PDF / 印刷
                     </button>
                 </div>
@@ -256,19 +250,18 @@
                 <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
-                <p class="text-xs font-medium text-slate-500">この月（または選択中業務）の記録はありません</p>
+                <p class="text-xs font-medium text-slate-500">選択月の記録はありません</p>
             </div>
         </section>
 
         <!-- Print / PDF Submission View (Only active on print preview) -->
         <div class="print-only print-container">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h1 style="font-size: 18pt; font-weight: bold; margin-bottom: 5px;">フレックスタイム調整 勤務実績報告書</h1>
+                <h1 style="font-size: 18pt; font-weight: bold; margin-bottom: 5px;">フレックスタイム超過・不足時間 報告書</h1>
                 <p style="font-size: 11pt; color: #444;">対象年月: <span id="printMonthLabel" style="font-weight: bold; color: #000;"></span></p>
             </div>
 
             <div style="margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 10pt;">
-                <div>基本標準時間: 1日 7時間</div>
                 <div>対象業務: <span id="printJobFilterLabel">すべて</span></div>
                 <div>発行日: <span id="printTodayDate"></span></div>
             </div>
@@ -276,8 +269,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 18%;">日付</th>
-                        <th style="width: 22%;">業務種別</th>
+                        <th style="width: 20%;">日付</th>
+                        <th style="width: 25%;">業務種別</th>
                         <th style="width: 15%;">区分</th>
                         <th style="width: 20%;">調整時間</th>
                         <th>備考・事由</th>
@@ -289,13 +282,9 @@
             </table>
 
             <div style="margin-top: 25px; border-top: 2px solid #000; padding-top: 12px; font-size: 11pt;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                    <div>標準必要時間計: <span id="printStandardRequired"></span></div>
-                    <div>実労働時間計: <span id="printTotalWorked" style="font-weight: bold;"></span></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12pt; background-color: #f9fafb; padding: 8px; border: 1px solid #ccc;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13pt; background-color: #f9fafb; padding: 10px; border: 1px solid #ccc;">
                     <div>当月 差引累計時間 (超過/不足):</div>
-                    <div id="printNetTotal" style="font-size: 13pt;"></div>
+                    <div id="printNetTotal" style="font-size: 14pt;"></div>
                 </div>
             </div>
         </div>
@@ -304,11 +293,11 @@
 
     <!-- Settings & Backup Modal -->
     <div id="settingsModal" class="no-print fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
                     <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                    設定・データ移行
+                    設定・データ管理
                 </h3>
                 <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -317,9 +306,9 @@
 
             <!-- Job Category Management Section -->
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-800 uppercase">業務種別の追加・管理</label>
+                <label class="block text-xs font-bold text-slate-800 uppercase">業務種別の追加・削除</label>
                 <div class="flex gap-2">
-                    <input type="text" id="newCategoryInput" placeholder="例: A社業務, プロジェクトB" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-brand-500">
+                    <input type="text" id="newCategoryInput" placeholder="例: A案件, プロジェクトB" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-brand-500">
                     <button onclick="addJobCategory()" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800">
                         追加
                     </button>
@@ -333,8 +322,8 @@
 
             <!-- Backup Code Copy Section -->
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-800 uppercase">1. データのバックアップ (機種変更時)</label>
-                <p class="text-xs text-slate-500">全記録を暗号コード化してコピーします。メモ帳やLINE等に保管してください。</p>
+                <label class="block text-xs font-bold text-slate-800 uppercase">1. データバックアップ (機種変更時)</label>
+                <p class="text-xs text-slate-500">全記録をコード化してコピーします。</p>
                 <button onclick="copyBackupCode()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors">
                     <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     バックアップコードをコピー
@@ -346,15 +335,14 @@
             <!-- Restore Section -->
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-800 uppercase">2. データの復元</label>
-                <p class="text-xs text-slate-500">コピーしておいたバックアップコードを下に貼り付けて復元します。</p>
-                <textarea id="restoreInput" rows="3" placeholder="バックアップコードをここに貼り付け" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-mono text-slate-700"></textarea>
-                <button onclick="restoreData()" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs transition-colors shadow-sm">
-                    データを復元する
+                <textarea id="restoreInput" rows="2" placeholder="バックアップコードを貼り付け" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 font-mono text-slate-700"></textarea>
+                <button onclick="restoreData()" class="w-full py-2 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs transition-colors shadow-sm">
+                    復元を実行する
                 </button>
             </div>
 
             <div class="pt-2 text-right">
-                <button onclick="closeSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">
+                <button onclick="closeSettingsModal()" class="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800">
                     閉じる
                 </button>
             </div>
@@ -367,8 +355,8 @@
     </div>
 
     <script>
-        const STORAGE_RECORDS_KEY = 'flextime_records_v2';
-        const STORAGE_CATEGORIES_KEY = 'flextime_categories_v2';
+        const STORAGE_RECORDS_KEY = 'flextime_diff_records_v3';
+        const STORAGE_CATEGORIES_KEY = 'flextime_diff_categories_v3';
 
         let records = [];
         let jobCategories = ['メイン業務', 'サブ業務'];
@@ -385,7 +373,7 @@
             renderApp();
         });
 
-        // Load Categories from localStorage
+        // Load Categories from LocalStorage
         function loadCategories() {
             try {
                 const stored = localStorage.getItem(STORAGE_CATEGORIES_KEY);
@@ -417,7 +405,7 @@
             const currentInputVal = inputSelect.value;
 
             // Filter select
-            filterSelect.innerHTML = '<option value="ALL">すべての業務 (全体累計)</option>';
+            filterSelect.innerHTML = '<option value="ALL">すべての業務 (全累計)</option>';
             jobCategories.forEach(cat => {
                 const opt = document.createElement('option');
                 opt.value = cat;
@@ -446,7 +434,7 @@
                 chip.className = 'inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg';
                 chip.innerHTML = `
                     ${escapeHtml(cat)}
-                    ${jobCategories.length > 1 ? `<button onclick="removeJobCategory('${escapeHtml(cat)}')" class="text-slate-400 hover:text-rose-600 ml-1">×</button>` : ''}
+                    ${jobCategories.length > 1 ? `<button onclick="removeJobCategory('${escapeHtml(cat)}')" class="text-slate-400 hover:text-rose-600 ml-1 font-bold">×</button>` : ''}
                 `;
                 chipsContainer.appendChild(chip);
             });
@@ -525,7 +513,9 @@
             document.getElementById('inputNote').value = '';
         }
 
+        // Quick Add Handler (Positive/Negative mins, NO 0m)
         function quickAdd(mins) {
+            if (mins === 0) return;
             const date = document.getElementById('inputDate').value;
             const category = document.getElementById('inputJobCategory').value;
             const note = document.getElementById('inputNote').value.trim();
@@ -540,6 +530,8 @@
         }
 
         function addRecord(date, category, minutes, note) {
+            if (minutes === 0) return; // Guard against 0 minutes
+
             const record = {
                 id: Date.now().toString(),
                 date: date,
@@ -554,14 +546,14 @@
 
             saveRecords();
 
-            // Auto shift month filter if needed
+            // Auto shift month filter if recorded month differs
             const recordMonth = date.substring(0, 7);
             if (recordMonth !== document.getElementById('monthPicker').value) {
                 document.getElementById('monthPicker').value = recordMonth;
             }
 
             renderApp();
-            showToast("差引時間を追加登録しました");
+            showToast("調整時間を登録しました");
         }
 
         function deleteRecord(id) {
@@ -571,35 +563,16 @@
             showToast("削除しました");
         }
 
-        // Calculate weekdays in month (Monday - Friday)
-        function getWorkingDaysInMonth(year, monthIndex) {
-            const date = new Date(year, monthIndex, 1);
-            let count = 0;
-            while (date.getMonth() === monthIndex) {
-                const day = date.getDay();
-                if (day !== 0 && day !== 6) { // Not Sunday or Saturday
-                    count++;
-                }
-                date.setDate(date.getDate() + 1);
-            }
-            return count;
-        }
-
         // Main Render Function
         function renderApp() {
             const selectedMonth = document.getElementById('monthPicker').value;
             const selectedCategory = document.getElementById('jobCategoryFilter').value;
 
-            // Filter records
+            // Filter records for selected month and category
             const monthFiltered = records.filter(r => r.date.startsWith(selectedMonth));
             const filtered = monthFiltered.filter(r => {
                 return selectedCategory === 'ALL' || r.category === selectedCategory;
             });
-
-            // Calculate Working Days & Standard Hours (7 hours = 420 mins per day)
-            const [year, monthNum] = selectedMonth.split('-').map(Number);
-            const workingDays = getWorkingDaysInMonth(year, monthNum - 1);
-            const standardRequiredMinutes = workingDays * 7 * 60; // 7h / day
 
             // Calculate Totals
             let totalExcessMinutes = 0;
@@ -611,45 +584,46 @@
             });
 
             const netAdjustmentMinutes = totalExcessMinutes - totalShortageMinutes;
-            const totalWorkedMinutes = standardRequiredMinutes + netAdjustmentMinutes;
 
             // Update Hero Card UI
             const heroNetValue = document.getElementById('heroNetValue');
-            const heroCard = document.getElementById('heroCard');
             const heroBadge = document.getElementById('heroBadge');
+            const heroPulseDot = document.getElementById('heroPulseDot');
 
+            const [year, monthNum] = selectedMonth.split('-').map(Number);
             document.getElementById('heroMonthLabel').innerText = `${year}年${monthNum}月`;
-            document.getElementById('statWorkingDays').innerText = `${workingDays}日`;
 
-            const signSymbol = netAdjustmentMinutes >= 0 ? '+' : '-';
+            const signSymbol = netAdjustmentMinutes > 0 ? '+' : (netAdjustmentMinutes < 0 ? '-' : '');
             const absNetMinutes = Math.abs(netAdjustmentMinutes);
-            heroNetValue.innerText = `${signSymbol}${formatHoursMinutes(absNetMinutes)}`;
+            
+            heroNetValue.innerText = netAdjustmentMinutes === 0 ? '0分' : `${signSymbol}${formatHoursMinutes(absNetMinutes)}`;
 
             if (netAdjustmentMinutes > 0) {
-                heroNetValue.className = "text-3xl sm:text-4xl font-black tracking-tight text-emerald-400";
+                heroNetValue.className = "text-4xl sm:text-5xl font-black tracking-tight text-emerald-400";
                 heroBadge.innerText = "超過 (プラス貯金)";
                 heroBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                heroPulseDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
             } else if (netAdjustmentMinutes < 0) {
-                heroNetValue.className = "text-3xl sm:text-4xl font-black tracking-tight text-rose-400";
+                heroNetValue.className = "text-4xl sm:text-5xl font-black tracking-tight text-rose-400";
                 heroBadge.innerText = "不足 (マイナス注意)";
                 heroBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                heroPulseDot.className = "w-2 h-2 rounded-full bg-rose-400 animate-pulse";
             } else {
-                heroNetValue.className = "text-3xl sm:text-4xl font-black tracking-tight text-brand-400";
-                heroBadge.innerText = "±0分 (標準ジャスト)";
+                heroNetValue.className = "text-4xl sm:text-5xl font-black tracking-tight text-brand-400";
+                heroBadge.innerText = "プラマイゼロ (差分なし)";
                 heroBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30";
+                heroPulseDot.className = "w-2 h-2 rounded-full bg-brand-400 animate-pulse";
             }
 
-            // Update Stats Grid
-            document.getElementById('statTotalWorked').innerText = formatHoursMinutes(totalWorkedMinutes);
-            document.getElementById('statStandardRequired').innerText = formatHoursMinutes(standardRequiredMinutes);
+            // Update Excess/Shortage Sub-totals
             document.getElementById('statExcessOnly').innerText = `+${formatHoursMinutes(totalExcessMinutes)}`;
             document.getElementById('statShortageOnly').innerText = `-${formatHoursMinutes(totalShortageMinutes)}`;
 
             // Render Records List
             renderRecordsList(filtered);
 
-            // Prepare Print Layout
-            renderPrintView(filtered, selectedMonth, selectedCategory, standardRequiredMinutes, totalWorkedMinutes, netAdjustmentMinutes);
+            // Prepare Print View
+            renderPrintView(filtered, selectedMonth, selectedCategory, netAdjustmentMinutes);
         }
 
         // Render List Items
@@ -698,7 +672,7 @@
         }
 
         // Render Print Table
-        function renderPrintView(filteredList, monthStr, categoryStr, reqMins, workedMins, netMins) {
+        function renderPrintView(filteredList, monthStr, categoryStr, netMins) {
             document.getElementById('printMonthLabel').innerText = monthStr.replace('-', '年 ') + '月';
             document.getElementById('printJobFilterLabel').innerText = categoryStr === 'ALL' ? '全業務' : categoryStr;
             document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('ja-JP');
@@ -719,11 +693,8 @@
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('printStandardRequired').innerText = formatHoursMinutes(reqMins);
-            document.getElementById('printTotalWorked').innerText = formatHoursMinutes(workedMins);
-
-            const signSymbol = netMins >= 0 ? '+' : '-';
-            document.getElementById('printNetTotal').innerText = `${signSymbol}${formatHoursMinutes(Math.abs(netMins))}`;
+            const signSymbol = netMins > 0 ? '+' : (netMins < 0 ? '-' : '');
+            document.getElementById('printNetTotal').innerText = netMins === 0 ? '0分' : `${signSymbol}${formatHoursMinutes(Math.abs(netMins))}`;
         }
 
         // CSV Export (Excel UTF-8 BOM compatibility)
@@ -752,7 +723,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.setAttribute('href', url);
-            link.setAttribute('download', `flextime_report_${selectedMonth}_${selectedCategory}.csv`);
+            link.setAttribute('download', `flextime_diff_${selectedMonth}_${selectedCategory}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -824,7 +795,7 @@
                 renderApp();
                 closeSettingsModal();
                 document.getElementById('restoreInput').value = '';
-                showToast("データを正常に復元しました！");
+                showToast("データを復元しました！");
             } catch (e) {
                 showToast("無効なバックアップコードです");
             }
