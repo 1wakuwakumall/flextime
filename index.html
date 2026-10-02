@@ -3,37 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>フレックスタイム管理</title>
+  <title>フレックスタイム超過・不足管理</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      body { background: white !important; color: black !important; font-size: 11pt; padding: 0; margin: 0; }
+      body { background: white !important; color: black !important; font-size: 10pt; padding: 0; margin: 0; }
       .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
       .card-print { border: none !important; box-shadow: none !important; padding: 0 !important; }
-      table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-      th, td { border: 1px solid #000 !important; padding: 6px 10px !important; text-align: left; }
-      th { background-color: #f2f2f2 !important; }
+      table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+      th, td { border: 1px solid #000 !important; padding: 6px 8px !important; text-align: left; }
+      th { background-color: #f2f2f2 !important; font-weight: bold; }
     }
     .print-only { display: none; }
+    
+    /* Custom Toast Slide Animation */
+    @keyframes slideDown {
+      from { transform: translate(-50%, -100%); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .animate-toast {
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 pb-12 font-sans antialiased">
+<body class="bg-slate-100 min-h-screen text-slate-800 pb-12 antialiased">
 
-  <!-- Header (Screen only) -->
-  <header class="no-print bg-indigo-700 text-white shadow-md">
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden bg-slate-900/90 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-2 transition-all animate-toast pointer-events-none">
+    <span id="toastIcon">✨</span>
+    <span id="toastMessage">メッセージ</span>
+  </div>
+
+  <!-- Global Confirm Modal (Replaces window.confirm) -->
+  <div id="confirmModal" class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl p-5 border border-slate-100 space-y-4 transform transition-all">
+      <div class="flex items-center gap-3 text-amber-500">
+        <span class="text-2xl">⚠️</span>
+        <h3 id="confirmTitle" class="font-bold text-slate-800 text-base">確認</h3>
+      </div>
+      <p id="confirmMessage" class="text-xs text-slate-600 leading-relaxed">実行してもよろしいですか？</p>
+      <div class="flex gap-2 pt-2">
+        <button id="confirmCancelBtn" class="flex-1 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition">
+          キャンセル
+        </button>
+        <button id="confirmOkBtn" class="flex-1 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 transition">
+          実行する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen Header -->
+  <header class="no-print bg-indigo-700 text-white shadow-md sticky top-0 z-30">
     <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-      <h1 class="text-lg font-bold tracking-wide flex items-center gap-2">
-        <span>⏱️️</span> フレックスタイム管理
+      <h1 class="text-base font-bold tracking-wide flex items-center gap-2">
+        <span class="text-xl">⏱️</span> フレックスタイム管理
       </h1>
-      <button onclick="openSettingsModal()" class="p-2 rounded-full hover:bg-indigo-600 active:scale-95 transition-transform" title="設定">
+      <button onclick="openSettingsModal()" class="p-2 rounded-full hover:bg-indigo-600 active:scale-95 transition" title="設定・バックアップ">
         <span class="text-xl">⚙️</span>
       </button>
     </div>
   </header>
 
-  <!-- Print Header (Print only) -->
+  <!-- Print Layout Header (Print view only) -->
   <div class="print-only">
     <h1 class="text-2xl font-bold text-center mb-4">フレックスタイム勤務調整報告書</h1>
     <div class="grid grid-cols-2 gap-2 mb-4 text-sm border-b pb-3">
@@ -45,73 +83,110 @@
     </div>
   </div>
 
-  <main class="max-w-md mx-auto px-4 mt-4">
+  <main class="max-w-md mx-auto px-4 mt-4 space-y-4">
 
     <!-- Dashboard Card -->
-    <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-4">
+    <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4">
       
-      <!-- Month Selector -->
-      <div class="flex items-center justify-between mb-4 bg-slate-50 rounded-xl p-1.5 border border-slate-200">
-        <button onclick="changeMonth(-1)" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-sm font-bold text-slate-700 hover:bg-slate-100 active:scale-95 transition">
+      <!-- Month Navigation -->
+      <div class="flex items-center justify-between mb-3 bg-slate-50 rounded-xl p-1.5 border border-slate-200/60">
+        <button onclick="changeMonth(-1)" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-xs font-bold text-slate-700 hover:bg-slate-100 active:scale-95 transition">
           ＜ 前月
         </button>
-        <div id="currentMonthDisplay" class="text-base font-bold text-slate-800">2026年10月</div>
-        <button onclick="changeMonth(1)" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-sm font-bold text-slate-700 hover:bg-slate-100 active:scale-95 transition">
+        <div id="currentMonthDisplay" class="text-sm font-extrabold text-slate-800 tracking-wide">2026年10月</div>
+        <button onclick="changeMonth(1)" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-sm text-xs font-bold text-slate-700 hover:bg-slate-100 active:scale-95 transition">
           次月 ＞
         </button>
       </div>
 
       <!-- Totals Display (Monthly & All-time) -->
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-2 gap-2.5">
         <!-- 当月差分累計 -->
-        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-center shadow-inner">
-          <div class="text-xs font-bold text-indigo-600 mb-1">当月差分累計</div>
-          <div id="monthlyTotalDisplay" class="text-xl font-extrabold text-indigo-900">+0時間00分</div>
+        <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 text-center">
+          <div class="text-[11px] font-bold text-indigo-600 mb-0.5">当月差分累計</div>
+          <div id="monthlyTotalDisplay" class="text-lg font-extrabold text-indigo-950">+0時間00分</div>
         </div>
 
         <!-- 全期間差分累計 -->
-        <div class="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center shadow-inner">
-          <div class="text-xs font-bold text-purple-600 mb-1">全期間差分累計</div>
-          <div id="allTimeTotalDisplay" class="text-xl font-extrabold text-purple-900">+0時間00分</div>
+        <div class="bg-purple-50/70 border border-purple-100 rounded-xl p-3 text-center">
+          <div class="text-[11px] font-bold text-purple-600 mb-0.5">全期間差分累計</div>
+          <div id="allTimeTotalDisplay" class="text-lg font-extrabold text-purple-950">+0時間00分</div>
         </div>
       </div>
     </div>
 
-    <!-- Quick Adjustment Section -->
-    <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-4">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">クイック調整 (ワンタップ)</h2>
-      
-      <!-- Plus Buttons -->
-      <div class="grid grid-cols-4 gap-2 mb-2">
-        <button onclick="quickAdd(30)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm hover:bg-emerald-100 active:scale-95 transition">+30分</button>
-        <button onclick="quickAdd(60)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm hover:bg-emerald-100 active:scale-95 transition">+1時間</button>
-        <button onclick="quickAdd(90)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm hover:bg-emerald-100 active:scale-95 transition">+1.5時間</button>
-        <button onclick="quickAdd(120)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm hover:bg-emerald-100 active:scale-95 transition">+2時間</button>
+    <!-- Quick Adjustment Section with Prominent Target Date Selection -->
+    <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4">
+      <div class="flex items-center justify-between mb-2.5">
+        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <span>⚡</span> クイック調整
+        </h2>
+        <span class="text-[10px] text-slate-400 font-medium">タップで即時登録</span>
       </div>
 
-      <!-- Minus Buttons -->
-      <div class="grid grid-cols-4 gap-2">
-        <button onclick="quickAdd(-30)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm hover:bg-rose-100 active:scale-95 transition">-30分</button>
-        <button onclick="quickAdd(-60)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm hover:bg-rose-100 active:scale-95 transition">-1時間</button>
-        <button onclick="quickAdd(-90)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm hover:bg-rose-100 active:scale-95 transition">-1.5時間</button>
-        <button onclick="quickAdd(-120)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm hover:bg-rose-100 active:scale-95 transition">-2時間</button>
+      <!-- Target Date Selector Container (Prominently placed at top) -->
+      <div class="mb-3.5 bg-slate-50 border border-indigo-100 rounded-xl p-2.5">
+        <label class="block text-[11px] font-bold text-indigo-900 mb-1 flex items-center justify-between">
+          <span>📅 対象日付の選択</span>
+          <span id="targetDateDayOfWeek" class="text-indigo-600 font-semibold">（本日）</span>
+        </label>
+        <div class="flex gap-2">
+          <input type="date" id="quickTargetDate" onchange="handleTargetDateChange()" class="flex-1 px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+          <button onclick="setTargetDateToToday()" class="px-3 py-1.5 bg-indigo-600 text-white font-bold text-xs rounded-lg hover:bg-indigo-700 active:scale-95 transition shadow-sm whitespace-nowrap">
+            本日
+          </button>
+        </div>
+      </div>
+
+      <!-- Plus Adjustments Grid (+30m ~ +2h) -->
+      <div class="grid grid-cols-4 gap-1.5 mb-2">
+        <button onclick="quickAdd(30)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs hover:bg-emerald-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>+30分</span>
+        </button>
+        <button onclick="quickAdd(60)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs hover:bg-emerald-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>+1時間</span>
+        </button>
+        <button onclick="quickAdd(90)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs hover:bg-emerald-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>+1.5時間</span>
+        </button>
+        <button onclick="quickAdd(120)" class="py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs hover:bg-emerald-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>+2時間</span>
+        </button>
+      </div>
+
+      <!-- Minus Adjustments Grid (-30m ~ -2h) -->
+      <div class="grid grid-cols-4 gap-1.5">
+        <button onclick="quickAdd(-30)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-extrabold text-xs hover:bg-rose-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>-30分</span>
+        </button>
+        <button onclick="quickAdd(-60)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-extrabold text-xs hover:bg-rose-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>-1時間</span>
+        </button>
+        <button onclick="quickAdd(-90)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-extrabold text-xs hover:bg-rose-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>-1.5時間</span>
+        </button>
+        <button onclick="quickAdd(-120)" class="py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-extrabold text-xs hover:bg-rose-100 active:scale-95 transition shadow-sm flex flex-col items-center justify-center">
+          <span>-2時間</span>
+        </button>
       </div>
     </div>
 
-    <!-- Custom Entry Form -->
-    <details class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 mb-4 overflow-hidden group">
-      <summary class="px-4 py-3 font-bold text-sm text-slate-600 flex items-center justify-between cursor-pointer select-none bg-slate-50 hover:bg-slate-100">
-        <span>📝 詳細・カスタム入力フォーム</span>
-        <span class="text-xs transition-transform group-open:rotate-180">▼</span>
+    <!-- Custom Entry Accordion Form -->
+    <details class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden group">
+      <summary class="px-4 py-3 font-bold text-xs text-slate-600 flex items-center justify-between cursor-pointer select-none bg-slate-50/50 hover:bg-slate-100/80 transition">
+        <span class="flex items-center gap-1.5">
+          <span>📝</span> 備考付き・カスタム時間登録
+        </span>
+        <span class="text-[10px] text-slate-400 transition-transform group-open:rotate-180">▼</span>
       </summary>
       <form onsubmit="handleCustomSubmit(event)" class="p-4 space-y-3 border-t border-slate-100">
         <div>
           <label class="block text-xs font-bold text-slate-500 mb-1">日付</label>
-          <input type="date" id="entryDate" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="date" id="customEntryDate" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 mb-1">調整時間</label>
-          <select id="entryAmount" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          <select id="customEntryAmount" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
             <option value="120">+2時間00分 (+120分)</option>
             <option value="90">+1時間30分 (+90分)</option>
             <option value="60">+1時間00分 (+60分)</option>
@@ -124,61 +199,65 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 mb-1">備考 (任意)</label>
-          <input type="text" id="entryNote" placeholder="例: 早出、残業調整など" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="customEntryNote" placeholder="例: 早出、業務都合による短縮など" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
-        <button type="submit" class="w-full py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 active:scale-95 transition">
+        <button type="submit" class="w-full py-2.5 bg-indigo-600 text-white font-bold text-xs rounded-xl hover:bg-indigo-700 active:scale-95 transition shadow-sm">
           記録を追加する
         </button>
       </form>
     </details>
 
-    <!-- Records List & Export Section -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-4 card-print">
+    <!-- Records List & Export Panel -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 card-print space-y-4">
       
-      <!-- Submitter Info (Screen only) -->
-      <div class="no-print mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-        <h3 class="text-xs font-bold text-slate-500 uppercase">提出者情報 (自動保存)</h3>
+      <!-- Submitter Information (Screen only) -->
+      <div class="no-print p-3 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
+        <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <span>👤</span> 提出者情報 (自動保存)
+        </h3>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs text-slate-500">会社名・所属</label>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">会社名・所属</label>
             <input type="text" id="companyInput" onchange="saveUserInfo()" placeholder="〇〇株式会社" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
           <div>
-            <label class="block text-xs text-slate-500">氏名</label>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">氏名</label>
             <input type="text" id="userInput" onchange="saveUserInfo()" placeholder="山田 太郎" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
         </div>
       </div>
 
       <!-- Export Action Buttons -->
-      <div class="no-print flex gap-2 mb-4">
-        <button onclick="exportCSV()" class="flex-1 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 active:scale-95 transition flex items-center justify-center gap-1">
-          <span>📊</span> CSV出力
+      <div class="no-print flex gap-2">
+        <button onclick="exportCSV()" class="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5">
+          <span>📊</span> CSVで出力
         </button>
-        <button onclick="printPDF()" class="flex-1 py-2 bg-slate-700 text-white text-xs font-bold rounded-xl hover:bg-slate-800 active:scale-95 transition flex items-center justify-center gap-1">
+        <button onclick="printPDF()" class="flex-1 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5">
           <span>🖨️</span> PDF / 印刷
         </button>
       </div>
 
       <!-- Records Table Header -->
-      <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-        <h2 class="text-sm font-bold text-slate-800">当月の記録一覧</h2>
-        <span id="recordCount" class="text-xs text-slate-400 no-print">0件</span>
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h2 class="text-xs font-extrabold text-slate-800 flex items-center gap-1">
+          <span>📋</span> 当月の記録一覧
+        </h2>
+        <span id="recordCount" class="text-xs font-semibold text-slate-400 no-print">0件</span>
       </div>
 
       <!-- Table Container -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
+        <table class="w-full text-left text-xs">
           <thead>
-            <tr class="text-xs text-slate-400 border-b border-slate-200">
+            <tr class="text-[11px] text-slate-400 border-b border-slate-200">
               <th class="py-2 px-1 font-bold">日付</th>
               <th class="py-2 px-1 font-bold">調整時間</th>
               <th class="py-2 px-1 font-bold">備考</th>
-              <th class="py-2 px-1 font-bold text-right no-print">操作</th>
+              <th class="py-2 px-1 font-bold text-right no-print">削除</th>
             </tr>
           </thead>
           <tbody id="recordsTableBody">
-            <!-- Records rendered dynamically -->
+            <!-- Dynamically populated rows -->
           </tbody>
         </table>
       </div>
@@ -187,27 +266,29 @@
 
   </main>
 
-  <!-- Settings Modal -->
+  <!-- Settings Modal Dialog -->
   <div id="settingsModal" class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl p-5 border border-slate-100 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-slate-800">⚙️ 設定・バックアップ</h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 font-bold p-1">✕</button>
+      <div class="flex items-center justify-between border-b pb-2.5">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+          <span>⚙️</span> 設定・バックアップ管理
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 font-bold text-sm p-1">✕</button>
       </div>
 
       <!-- Backup Code Export -->
-      <div class="space-y-1">
-        <label class="block text-xs font-bold text-slate-600">バックアップコード (データ引継ぎ用)</label>
-        <textarea id="backupExportCode" readonly class="w-full h-16 text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono resize-none focus:outline-none"></textarea>
+      <div class="space-y-1.5">
+        <label class="block text-xs font-bold text-slate-600">バックアップコード (データ出力)</label>
+        <textarea id="backupExportCode" readonly class="w-full h-16 text-[11px] p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono resize-none focus:outline-none"></textarea>
         <button onclick="copyBackupCode()" class="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg hover:bg-indigo-100 active:scale-95 transition">
           バックアップコードをコピー
         </button>
       </div>
 
       <!-- Backup Code Import -->
-      <div class="space-y-1 border-t pt-3">
-        <label class="block text-xs font-bold text-slate-600">復元用コードの貼り付け</label>
-        <textarea id="backupImportCode" placeholder="ここにバックアップコードを貼り付け" class="w-full h-16 text-xs p-2 border border-slate-200 rounded-lg font-mono resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      <div class="space-y-1.5 border-t pt-3">
+        <label class="block text-xs font-bold text-slate-600">復元コードの読み込み</label>
+        <textarea id="backupImportCode" placeholder="コピーしたコードを貼り付け" class="w-full h-16 text-[11px] p-2 border border-slate-200 rounded-lg font-mono resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
         <button onclick="restoreBackupCode()" class="w-full py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 active:scale-95 transition">
           データを復元する
         </button>
@@ -215,29 +296,32 @@
 
       <!-- Clear All -->
       <div class="border-t pt-3">
-        <button onclick="clearAllData()" class="w-full py-2 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg hover:bg-rose-100 transition">
-          全データを削除・初期化
+        <button onclick="clearAllDataPrompt()" class="w-full py-2 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg hover:bg-rose-100 transition">
+          全データを完全削除・初期化
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    // State
+    // State Variables
     let entries = JSON.parse(localStorage.getItem('flextime_entries')) || [];
     let companyName = localStorage.getItem('flextime_company') || '';
     let userName = localStorage.getItem('flextime_name') || '';
 
-    // Initialize Current Year Month
-    const today = new Date();
-    let currentYear = today.getFullYear();
-    let currentMonth = today.getMonth() + 1; // 1-12
+    // Date & Month Navigation State
+    const now = new Date();
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth() + 1; // 1-12
 
-    // DOM Elements
+    // DOM Ready Initialization
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('companyInput').value = companyName;
       document.getElementById('userInput').value = userName;
-      document.getElementById('entryDate').value = getTodayString();
+      
+      // Set initial target date to today
+      setTargetDateToToday();
+      
       render();
     });
 
@@ -251,6 +335,35 @@
 
     function formatYearMonth(y, m) {
       return `${y}-${String(m).padStart(2, '0')}`;
+    }
+
+    function setTargetDateToToday() {
+      const todayStr = getTodayString();
+      document.getElementById('quickTargetDate').value = todayStr;
+      document.getElementById('customEntryDate').value = todayStr;
+      handleTargetDateChange();
+      showToast('対象日付を「本日」に設定しました', 'ℹ️');
+    }
+
+    function handleTargetDateChange() {
+      const dateVal = document.getElementById('quickTargetDate').value;
+      if (!dateVal) return;
+
+      // Sync custom entry date input as well
+      document.getElementById('customEntryDate').value = dateVal;
+
+      // Calculate Day of Week
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      const [y, m, d] = dateVal.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const dayName = days[dateObj.getDay()];
+
+      const todayStr = getTodayString();
+      const isToday = dateVal === todayStr;
+
+      document.getElementById('targetDateDayOfWeek').textContent = isToday 
+        ? '（本日）' 
+        : `（${dayName}曜日）`;
     }
 
     function changeMonth(delta) {
@@ -275,53 +388,51 @@
       const monthlyEntries = entries.filter(e => e.date.startsWith(targetYM));
       monthlyEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-      // Calculate Monthly Total
+      // Calculate Totals
       const monthlyTotal = monthlyEntries.reduce((sum, e) => sum + Number(e.amount), 0);
-
-      // Calculate All-Time Total
       const allTimeTotal = entries.reduce((sum, e) => sum + Number(e.amount), 0);
 
       // Render Totals
       document.getElementById('monthlyTotalDisplay').textContent = formatMinutesText(monthlyTotal);
       document.getElementById('allTimeTotalDisplay').textContent = formatMinutesText(allTimeTotal);
 
-      // Render Count
+      // Render Record Count Badge
       document.getElementById('recordCount').textContent = `${monthlyEntries.length}件`;
 
-      // Render Table
+      // Render Table Content
       const tbody = document.getElementById('recordsTableBody');
       tbody.innerHTML = '';
 
       if (monthlyEntries.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="4" class="py-6 text-center text-xs text-slate-400">
-              この月の記録はありません
+            <td colspan="4" class="py-6 text-center text-xs text-slate-400 font-medium">
+              この月 (${currentYear}年${currentMonth}月) の記録はありません
             </td>
           </tr>
         `;
       } else {
         monthlyEntries.forEach(item => {
           const tr = document.createElement('tr');
-          tr.className = 'border-b border-slate-100 hover:bg-slate-50/50';
+          tr.className = 'border-b border-slate-100 hover:bg-slate-50/60 transition';
 
           const isPositive = item.amount > 0;
           const badgeClass = isPositive 
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-            : 'bg-rose-50 text-rose-700 border-rose-200';
+            ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+            : 'bg-rose-50 text-rose-800 border-rose-200';
 
           const dateFormatted = formatDateWithDay(item.date);
 
           tr.innerHTML = `
-            <td class="py-2.5 px-1 font-medium text-xs text-slate-700 whitespace-nowrap">${dateFormatted}</td>
+            <td class="py-2.5 px-1 font-bold text-xs text-slate-700 whitespace-nowrap">${dateFormatted}</td>
             <td class="py-2.5 px-1 whitespace-nowrap">
-              <span class="inline-block px-2 py-0.5 rounded-md text-xs font-bold border ${badgeClass}">
+              <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-extrabold border ${badgeClass}">
                 ${formatMinutesText(item.amount)}
               </span>
             </td>
-            <td class="py-2.5 px-1 text-xs text-slate-600">${escapeHtml(item.note || '')}</td>
+            <td class="py-2.5 px-1 text-xs text-slate-600 break-words">${escapeHtml(item.note || '-')}</td>
             <td class="py-2.5 px-1 text-right no-print">
-              <button onclick="deleteEntry('${item.id}')" class="text-slate-400 hover:text-rose-600 font-bold p-1 transition" title="削除">
+              <button onclick="deleteEntryPrompt('${item.id}')" class="text-slate-400 hover:text-rose-600 font-bold p-1 transition" title="削除">
                 🗑️
               </button>
             </td>
@@ -337,7 +448,7 @@
       document.getElementById('printMonthlyTotal').textContent = formatMinutesText(monthlyTotal);
       document.getElementById('printAllTimeTotal').textContent = formatMinutesText(allTimeTotal);
 
-      // Update Backup Code Textarea
+      // Update Backup Code Generator text
       updateBackupCodeDisplay();
     }
 
@@ -358,10 +469,17 @@
     }
 
     function quickAdd(amount) {
-      const targetYM = formatYearMonth(currentYear, currentMonth);
-      let dateVal = document.getElementById('entryDate').value;
-      if (!dateVal.startsWith(targetYM)) {
-        dateVal = `${targetYM}-01`;
+      const dateVal = document.getElementById('quickTargetDate').value;
+      if (!dateVal) {
+        showToast('対象日付を選択してください', '⚠️');
+        return;
+      }
+
+      // Check if entry date belongs to a different month than currently viewed
+      const [entryY, entryM] = dateVal.split('-').map(Number);
+      if (entryY !== currentYear || entryM !== currentMonth) {
+        currentYear = entryY;
+        currentMonth = entryM;
       }
 
       const newEntry = {
@@ -374,15 +492,25 @@
       entries.push(newEntry);
       saveEntries();
       render();
+
+      const timeFormatted = formatMinutesText(amount);
+      const [y, m, d] = dateVal.split('-');
+      showToast(`${m}/${d} に ${timeFormatted} を記録しました`, '✨');
     }
 
     function handleCustomSubmit(e) {
       e.preventDefault();
-      const dateVal = document.getElementById('entryDate').value;
-      const amountVal = Number(document.getElementById('entryAmount').value);
-      const noteVal = document.getElementById('entryNote').value.trim();
+      const dateVal = document.getElementById('customEntryDate').value;
+      const amountVal = Number(document.getElementById('customEntryAmount').value);
+      const noteVal = document.getElementById('customEntryNote').value.trim();
 
       if (!dateVal || isNaN(amountVal)) return;
+
+      const [entryY, entryM] = dateVal.split('-').map(Number);
+      if (entryY !== currentYear || entryM !== currentMonth) {
+        currentYear = entryY;
+        currentMonth = entryM;
+      }
 
       const newEntry = {
         id: Date.now().toString(),
@@ -393,16 +521,10 @@
 
       entries.push(newEntry);
       saveEntries();
-      document.getElementById('entryNote').value = '';
+      document.getElementById('customEntryNote').value = '';
       render();
-    }
 
-    function deleteEntry(id) {
-      if (confirm('この記録を削除してもよろしいですか？')) {
-        entries = entries.filter(e => e.id !== id);
-        saveEntries();
-        render();
-      }
+      showToast('詳細記録を追加しました', '✅');
     }
 
     function saveEntries() {
@@ -415,6 +537,7 @@
       localStorage.setItem('flextime_company', companyName);
       localStorage.setItem('flextime_name', userName);
       render();
+      showToast('提出者情報を保存しました', '💾');
     }
 
     function exportCSV() {
@@ -443,16 +566,71 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `flextime_${targetYM}.csv`;
+      a.download = `フレックス調整報告_${targetYM}_${userName || '未記入'}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+
+      showToast('CSVファイルをダウンロードしました', '📊');
     }
 
     function printPDF() {
       window.print();
     }
 
-    // Modal & Backup
+    function deleteEntryPrompt(id) {
+      showConfirmModal(
+        '記録の削除',
+        'この調整記録を削除してもよろしいですか？',
+        () => {
+          entries = entries.filter(e => e.id !== id);
+          saveEntries();
+          render();
+          showToast('記録を削除しました', '🗑️');
+        }
+      );
+    }
+
+    function clearAllDataPrompt() {
+      showConfirmModal(
+        '全データの削除・初期化',
+        'すべての調整記録と提出者情報が完全に消去されます。元に戻すことはできません。よろしいですか？',
+        () => {
+          localStorage.clear();
+          entries = [];
+          companyName = '';
+          userName = '';
+          document.getElementById('companyInput').value = '';
+          document.getElementById('userInput').value = '';
+          render();
+          closeSettingsModal();
+          showToast('すべてのデータを初期化しました', '🧹');
+        }
+      );
+    }
+
+    function showConfirmModal(title, message, onConfirm) {
+      const modal = document.getElementById('confirmModal');
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+
+      const okBtn = document.getElementById('confirmOkBtn');
+      const cancelBtn = document.getElementById('confirmCancelBtn');
+
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+      };
+
+      okBtn.onclick = () => {
+        cleanup();
+        onConfirm();
+      };
+
+      cancelBtn.onclick = cleanup;
+      modal.classList.remove('hidden');
+    }
+
     function openSettingsModal() {
       document.getElementById('settingsModal').classList.remove('hidden');
       updateBackupCodeDisplay();
@@ -480,62 +658,65 @@
     function copyBackupCode() {
       const codeArea = document.getElementById('backupExportCode');
       codeArea.select();
-      navigator.clipboard.writeText(codeArea.value).then(() => {
-        alert('バックアップコードをクリップボードにコピーしました！');
-      }).catch(() => {
-        alert('コピーに失敗しました。手動で選択してコピーしてください。');
-      });
+      try {
+        document.execCommand('copy');
+        showToast('バックアップコードをコピーしました', '📋');
+      } catch (err) {
+        showToast('コピーに失敗しました', '❌');
+      }
     }
 
     function restoreBackupCode() {
       const inputCode = document.getElementById('backupImportCode').value.trim();
       if (!inputCode) {
-        alert('復元用コードを入力してください。');
+        showToast('復元コードを入力してください', '⚠️');
         return;
       }
 
-      if (!confirm('現在のデータが上書きされます。復元を実行しますか？')) return;
+      showConfirmModal(
+        'データの復元',
+        '現在の記録が読み込んだコードの内容で上書きされます。実行しますか？',
+        () => {
+          try {
+            const jsonStr = decodeURIComponent(escape(atob(inputCode)));
+            const data = JSON.parse(jsonStr);
 
-      try {
-        const jsonStr = decodeURIComponent(escape(atob(inputCode)));
-        const data = JSON.parse(jsonStr);
+            if (data && Array.isArray(data.entries)) {
+              entries = data.entries;
+              companyName = data.company || '';
+              userName = data.name || '';
 
-        if (data && Array.isArray(data.entries)) {
-          entries = data.entries;
-          companyName = data.company || '';
-          userName = data.name || '';
+              localStorage.setItem('flextime_entries', JSON.stringify(entries));
+              localStorage.setItem('flextime_company', companyName);
+              localStorage.setItem('flextime_name', userName);
 
-          localStorage.setItem('flextime_entries', JSON.stringify(entries));
-          localStorage.setItem('flextime_company', companyName);
-          localStorage.setItem('flextime_name', userName);
+              document.getElementById('companyInput').value = companyName;
+              document.getElementById('userInput').value = userName;
+              document.getElementById('backupImportCode').value = '';
 
-          document.getElementById('companyInput').value = companyName;
-          document.getElementById('userInput').value = userName;
-          document.getElementById('backupImportCode').value = '';
-
-          render();
-          closeSettingsModal();
-          alert('データの復元が完了しました！');
-        } else {
-          alert('無効なバックアップコードです。');
+              render();
+              closeSettingsModal();
+              showToast('データの復元が完了しました！', '🎉');
+            } else {
+              showToast('無効なバックアップコードです', '❌');
+            }
+          } catch (e) {
+            showToast('コードの解析に失敗しました', '❌');
+          }
         }
-      } catch (e) {
-        alert('コードの解析に失敗しました。正しいコードか確認してください。');
-      }
+      );
     }
 
-    function clearAllData() {
-      if (confirm('【警告】すべての記録と提出者情報を完全に削除します。よろしいですか？')) {
-        localStorage.clear();
-        entries = [];
-        companyName = '';
-        userName = '';
-        document.getElementById('companyInput').value = '';
-        document.getElementById('userInput').value = '';
-        render();
-        closeSettingsModal();
-        alert('データを初期化しました。');
-      }
+    function showToast(message, icon = '✨') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = message;
+      document.getElementById('toastIcon').textContent = icon;
+
+      toast.classList.remove('hidden');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2500);
     }
 
     function escapeHtml(str) {
